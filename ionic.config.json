@@ -1,0 +1,7 @@
+{
+  "name": "heart2hub-mobile-application",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
