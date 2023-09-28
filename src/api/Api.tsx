@@ -10,4 +10,9 @@ export const patientApi = {
       requestBody
     );
   },
+  login(username: string, password: string) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/patient/patientLogin?username=${username}&password=${password}`
+    );
+  },
 };

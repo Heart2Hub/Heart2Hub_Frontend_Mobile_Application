@@ -1,8 +1,9 @@
-import { Redirect, Route } from "react-router-dom";
+import { Redirect, Route, useHistory } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
   IonLabel,
+  IonPage,
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
@@ -14,6 +15,7 @@ import { ellipse, square, triangle } from "ionicons/icons";
 import Tab1 from "./pages/Tab1";
 import Tab2 from "./pages/Tab2";
 import Tab3 from "./pages/Tab3";
+import { useEffect, useState } from "react";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -38,15 +40,46 @@ import Register1 from "./pages/Register1";
 import Register2 from "./pages/Register2";
 import Register from "./pages/Register";
 import Register3 from "./pages/Register3";
+import Home from "./pages/home/index";
+import Settings from "./pages/settings/index";
 
 setupIonicReact();
 
-const App: React.FC = () => (
+const App: React.FC = () => {
+
+  const history = useHistory();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const routes = [
+      {
+        "path": "/home",
+        "component": <Home />
+      },
+      {
+        "path": "/settings",
+        "component": <Settings />
+      }
+    ]
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    setIsAuthenticated(!!token);
+
+    window.addEventListener("storage", () => {
+      const token = localStorage.getItem("accessToken");
+      setIsAuthenticated(!!token);
+    });
+  }, [])
+
+  if (!isAuthenticated) {
+    return <Login />;
+  } 
+
+  return (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
         <Route exact path="/">
-          <Login />
+          {isAuthenticated ? <Redirect to="/home" /> : <Login />}
         </Route>
         <Route exact path="/register/step-1">
           <Register1 />
@@ -57,9 +90,14 @@ const App: React.FC = () => (
         <Route exact path="/register/step-3">
           <Register3 />
         </Route>
+        {routes.map(route => 
+          <Route exact path={route.path}>
+            {route.component}
+          </Route>)}
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
-);
+  );
+}
 
 export default App;
