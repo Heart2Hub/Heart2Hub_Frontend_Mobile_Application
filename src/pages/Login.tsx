@@ -91,7 +91,7 @@ const Login: React.FC = () => {
                 },
                 minLength: {
                   value: 8,
-                  message: "Password must be at least 8 characters",
+                  message: "Password must be at least 6 characters",
                 },
               })}
             ></IonInput>

@@ -19,7 +19,7 @@ import {
     IonTabs,
   } from "@ionic/react";
 import Navbar from '../navbar/index';
-import { personCircle, logOut } from 'ionicons/icons';
+import { personCircle, logOut, repeat } from 'ionicons/icons';
 import { Route, Redirect, useHistory } from 'react-router';
 
 type Props = {}
@@ -40,12 +40,16 @@ const Settings = () => {
 
     const history = useHistory();
 
-    const handleClick = () => {
+    const handleChangePassword = () => {
+        history.push('/settings/change-password')
+    }
+
+    const handleLogout = () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("username");
         localStorage.removeItem("isLoggedIn");
         window.dispatchEvent(new Event("storage"));
-        history.push('/')
+        history.replace('/')
     }
 
     return (
@@ -56,14 +60,19 @@ const Settings = () => {
                 </IonToolbar>
             </IonHeader>
           <IonContent className="ion-padding">
-            {/* <IonText color="danger">settings</IonText> */}
             <IonItem>
                 <IonIcon aria-hidden="true" icon={personCircle} slot="start"></IonIcon>
                 <IonLabel>
                 Profile
                 </IonLabel>
             </IonItem>
-            <IonItem button onClick={handleClick}>
+            <IonItem onClick={handleChangePassword}>
+                <IonIcon aria-hidden="true" icon={repeat} slot="start"></IonIcon>
+                <IonLabel>
+                Change password
+                </IonLabel>
+            </IonItem>
+            <IonItem button onClick={handleLogout}>
             <IonIcon aria-hidden="true" icon={logOut} slot="start"></IonIcon>
                 <IonLabel>
                 Logout

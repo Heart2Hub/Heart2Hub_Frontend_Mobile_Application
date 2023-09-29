@@ -1,4 +1,4 @@
-import { Redirect, Route, useHistory } from "react-router-dom";
+import { Redirect, Route, useHistory, useLocation } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
@@ -42,12 +42,13 @@ import Register from "./pages/Register";
 import Register3 from "./pages/Register3";
 import Home from "./pages/home/index";
 import Settings from "./pages/settings/index";
+import ChangePassword from "./pages/settings/ChangePassword";
+
 
 setupIonicReact();
 
 const App: React.FC = () => {
 
-  const history = useHistory();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const routes = [
       {
@@ -57,6 +58,10 @@ const App: React.FC = () => {
       {
         "path": "/settings",
         "component": <Settings />
+      },
+      {
+        "path": "/settings/change-password",
+        "component": <ChangePassword />
       }
     ]
 
@@ -70,16 +75,18 @@ const App: React.FC = () => {
     });
   }, [])
 
-  if (!isAuthenticated) {
-    return <Login />;
-  } 
-
   return (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
         <Route exact path="/">
-          {isAuthenticated ? <Redirect to="/home" /> : <Login />}
+          {isAuthenticated ? <Home /> : <Login />}
+        </Route>
+        <Route exact path="/login">
+        {!isAuthenticated ? <Login /> : <Home />}
+        </Route>
+        <Route exact path="/home">
+          {isAuthenticated ? <Home /> : <Login />}
         </Route>
         <Route exact path="/register/step-1">
           <Register1 />
@@ -92,7 +99,7 @@ const App: React.FC = () => {
         </Route>
         {routes.map(route => 
           <Route exact path={route.path}>
-            {route.component}
+            {isAuthenticated ? route.component : <Login />}
           </Route>)}
       </IonRouterOutlet>
     </IonReactRouter>
