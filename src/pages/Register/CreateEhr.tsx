@@ -21,6 +21,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import { useHistory, useLocation } from "react-router";
 import { ErrorMessage } from "@hookform/error-message";
+import "./styles.css";
 
 type FormValues = {
   firstName: string;

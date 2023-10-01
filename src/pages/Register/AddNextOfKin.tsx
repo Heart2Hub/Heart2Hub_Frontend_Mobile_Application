@@ -18,6 +18,7 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { useHistory, useLocation } from "react-router";
 import { patientApi } from "../../api/Api";
 import { InputChangeEventDetail } from "@ionic/core";
+import "./styles.css";
 
 interface NextOfKinRecord {
   relationship: string;

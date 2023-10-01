@@ -20,6 +20,7 @@ import { SubmitHandler, set, useForm } from "react-hook-form";
 import { useHistory } from "react-router";
 import { patientApi } from "../../api/Api";
 import { ErrorMessage } from "@hookform/error-message";
+import "./styles.css";
 
 type FormValues = {
   nric: string;
