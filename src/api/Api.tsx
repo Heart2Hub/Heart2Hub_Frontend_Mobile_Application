@@ -8,6 +8,19 @@ if (localStorage.getItem("accessToken")) {
     "Bearer " + localStorage.getItem("accessToken");
 }
 
+export const staffApi = {
+  getStaffListByRole(role: string, unit: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/staff/getStaffByRole?role=${role}&unit=${unit}`
+    );
+  },
+  getStaffById(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/staff/getStaffById?id=${id}`
+    );
+  },
+};
+
 export const patientApi = {
   createPatient(requestBody: any) {
     return axiosFetch.post(
@@ -26,3 +39,37 @@ export const patientApi = {
     );
   },
 };
+
+export const departmentApi = {
+  getAllDepartments(name: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/department/getAllDepartments?name=${name}`
+    );
+  },
+};
+
+export const shiftApi = {
+  viewOverallRoster(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/shift/viewOverallRoster/${username}`
+    );
+  },
+}
+
+export const appointmentApi = {
+  createAppointment(description: string, actualDate: string, bookedDate: string, priority: string, patientUsername: string, department: string, staffUsername: string) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/appointment/createNewAppointmentWithStaff?description=${description}&actualDateTime=${actualDate}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
+    );
+  },
+  viewPatientAppointments(username: string){
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/appointment/viewPatientAppointments?patientUsername=${username}`
+    );
+  },
+  viewAllAppointmentsByRange(startDay: number, startMonth: number, startYear: number, endDay: number, endMonth: number, endYear: number, departmentName: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}`
+    );
+  }
+}

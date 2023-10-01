@@ -43,6 +43,10 @@ import Register3 from "./pages/Register3";
 import Home from "./pages/home/index";
 import Settings from "./pages/settings/index";
 import ChangePassword from "./pages/settings/ChangePassword";
+import Appointments from "./pages/appointments";
+import BookAppointment from "./pages/appointments/BookAppointment";
+import SelectDateTime from "./pages/appointments/SelectDateTime";
+import ViewAppointment from "./pages/appointments/ViewAppointment";
 
 
 setupIonicReact();
@@ -62,7 +66,23 @@ const App: React.FC = () => {
       {
         "path": "/settings/change-password",
         "component": <ChangePassword />
-      }
+      },
+      {
+        "path": "/appointments",
+        "component": <Appointments />
+      },
+      {
+        "path": "/appointments/:id",
+        "component": <ViewAppointment />
+      },
+      {
+        "path": "/appointments/book-appointment",
+        "component": <BookAppointment />
+      },
+      {
+        "path": "/appointments/select-date-time/:selectedDepartment",
+        "component": <SelectDateTime />
+      },
     ]
 
   useEffect(() => {
