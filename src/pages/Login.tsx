@@ -16,7 +16,6 @@ import React, { useState } from "react";
 import heartLogo from "../assets/heartLogo.png";
 import { patientApi } from "../api/Api";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
-import { RegisterStep1 } from "../store/store";
 import { useHistory } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
 
@@ -25,6 +24,11 @@ interface DecodedToken {
   exp: number; 
   iat: number; 
   roles: []
+}
+
+interface RegisterStep1 {
+  username: string;
+  password: string;
 }
 
 const Login: React.FC = () => {
@@ -107,8 +111,11 @@ const Login: React.FC = () => {
         <IonButton expand="block" size="large" type="submit">
           Login
         </IonButton>
-        </form>
-        <IonButton expand="block" size="large" routerLink="/register/step-1">
+        <IonButton
+          expand="block"
+          size="large"
+          routerLink="/register/enter-nric"
+        >
           Create Account
         </IonButton>
       </IonContent>
