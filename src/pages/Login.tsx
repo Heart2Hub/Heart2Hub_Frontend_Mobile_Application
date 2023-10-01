@@ -38,7 +38,11 @@ const Login: React.FC = () => {
         <IonButton expand="block" size="large">
           Login
         </IonButton>
-        <IonButton expand="block" size="large" routerLink="/register/step-1">
+        <IonButton
+          expand="block"
+          size="large"
+          routerLink="/register/enter-nric"
+        >
           Create Account
         </IonButton>
       </IonContent>

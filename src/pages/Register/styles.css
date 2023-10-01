@@ -1,3 +1,17 @@
+.error {
+  color: #bf1650;
+}
+
+.error::before {
+  display: inline;
+  content: "⚠ ";
+}
+
+.flex-buttons {
+  display: flex;
+  justify-content: space-evenly;
+}
+
 ion-modal#example-modal {
   --width: fit-content;
   --min-width: 250px;

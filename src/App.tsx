@@ -34,10 +34,11 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import Login from "./pages/Login";
-import Register1 from "./pages/Register1";
-import Register2 from "./pages/Register2";
-import Register from "./pages/Register";
-import Register3 from "./pages/Register3";
+import AddNextOfKin from "./pages/Register/AddNextOfKin";
+import EnterNric from "./pages/Register/EnterNric";
+import CreateEhr from "./pages/Register/CreateEhr";
+import CreatePatientAccount from "./pages/Register/CreatePatientAccount";
+import Confirmation from "./pages/Register/Confirmation";
 
 setupIonicReact();
 
@@ -48,14 +49,20 @@ const App: React.FC = () => (
         <Route exact path="/">
           <Login />
         </Route>
-        <Route exact path="/register/step-1">
-          <Register1 />
+        <Route exact path="/register/enter-nric">
+          <EnterNric />
         </Route>
-        <Route exact path="/register/step-2">
-          <Register2 />
+        <Route exact path="/register/create-ehr">
+          <CreateEhr />
         </Route>
-        <Route exact path="/register/step-3">
-          <Register3 />
+        <Route exact path="/register/create-patient-account">
+          <CreatePatientAccount />
+        </Route>
+        <Route exact path="/register/add-next-of-kin">
+          <AddNextOfKin />
+        </Route>
+        <Route exact path="/register/confirmation">
+          <Confirmation />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>
