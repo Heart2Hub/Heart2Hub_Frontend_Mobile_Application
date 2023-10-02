@@ -111,6 +111,7 @@ const Login: React.FC = () => {
         <IonButton expand="block" size="large" type="submit">
           Login
         </IonButton>
+        </form>
         <IonButton
           expand="block"
           size="large"
