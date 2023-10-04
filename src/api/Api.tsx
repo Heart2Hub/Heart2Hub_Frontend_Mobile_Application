@@ -1,5 +1,5 @@
 import axios from "axios";
-import { REST_ENDPOINT, NEHR_SERVER } from "../constants/RestEndPoint";
+import { REST_ENDPOINT } from "../constants/RestEndPoint";
 
 let axiosFetch = axios.create();
 
@@ -15,9 +15,7 @@ export const staffApi = {
     );
   },
   getStaffById(id: number) {
-    return axiosFetch.get(
-      `${REST_ENDPOINT}/staff/getStaffById?id=${id}`
-    );
+    return axiosFetch.get(`${REST_ENDPOINT}/staff/getStaffById?id=${id}`);
   },
 };
 
@@ -72,22 +70,52 @@ export const shiftApi = {
       `${REST_ENDPOINT}/shift/viewOverallRoster/${username}`
     );
   },
-}
+};
 
 export const appointmentApi = {
-  createAppointment(description: string, actualDate: string, bookedDate: string, priority: string, patientUsername: string, department: string, staffUsername: string) {
+  createAppointment(
+    description: string,
+    actualDate: string,
+    bookedDate: string,
+    priority: string,
+    patientUsername: string,
+    department: string,
+    staffUsername: string
+  ) {
     return axiosFetch.post(
       `${REST_ENDPOINT}/appointment/createNewAppointmentWithStaff?description=${description}&actualDateTime=${actualDate}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
     );
   },
-  viewPatientAppointments(username: string){
+  viewPatientAppointments(username: string) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/appointment/viewPatientAppointments?patientUsername=${username}`
     );
   },
-  viewAllAppointmentsByRange(startDay: number, startMonth: number, startYear: number, endDay: number, endMonth: number, endYear: number, departmentName: string) {
+  viewAllAppointmentsByRange(
+    startDay: number,
+    startMonth: number,
+    startYear: number,
+    endDay: number,
+    endMonth: number,
+    endYear: number,
+    departmentName: string
+  ) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}`
     );
-  }
-}
+  },
+};
+
+export const electronicHealthRecordApi = {
+  getElectronicHealthRecordByUsername(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/electronicHealthRecord/getElectronicHealthRecordByUsername?username=${username}`
+    );
+  },
+  updateElectronicHealthRecord(ehr: any) {
+    return axiosFetch.put(
+      `${REST_ENDPOINT}/electronicHealthRecord/updateElectronicHealthRecord`,
+      ehr
+    );
+  },
+};
