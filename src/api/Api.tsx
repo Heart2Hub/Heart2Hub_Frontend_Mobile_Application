@@ -9,7 +9,7 @@ if (localStorage.getItem("accessToken")) {
 }
 
 export const imageServerApi = {
-  uploadProfilePhoto(type: string, image: FormData) {
+  uploadProfilePhoto(type: string, image: FormData | undefined) {
     return axiosFetch.post(`${IMAGE_SERVER}/upload/${type}`, image);
   },
 };
