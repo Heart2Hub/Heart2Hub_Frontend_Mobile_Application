@@ -45,7 +45,7 @@ import Home from "./pages/home/index";
 import Settings from "./pages/settings/index";
 import ChangePassword from "./pages/settings/ChangePassword";
 import Appointments from "./pages/appointments";
-import BookAppointment from "./pages/appointments/BookAppointment";
+import SelectDepartment from "./pages/appointments/SelectDepartment";
 import SelectDateTime from "./pages/appointments/SelectDateTime";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
 
@@ -77,8 +77,8 @@ const App: React.FC = () => {
         "component": <ViewAppointment />
       },
       {
-        "path": "/appointments/book-appointment",
-        "component": <BookAppointment />
+        "path": "/appointments/select-department",
+        "component": <SelectDepartment />
       },
       {
         "path": "/appointments/select-date-time/:selectedDepartment",

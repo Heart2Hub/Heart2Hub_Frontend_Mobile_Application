@@ -25,10 +25,11 @@ import {
     IonCol,
     IonModal,
     IonAlert,
+    IonToast,
   } from "@ionic/react";
 import Navbar from '../navbar/index';
-import { personCircle, logOut, repeat, checkmarkCircleOutline } from 'ionicons/icons';
-import { Route, Redirect, useHistory, useParams } from 'react-router';
+import { personCircle, logOut, repeat, checkmarkCircleOutline, time } from 'ionicons/icons';
+import { Route, Redirect, useHistory, useParams, useLocation } from 'react-router';
 import { appointmentApi, departmentApi, shiftApi, staffApi } from '../../api/Api';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
 import * as dayjs from 'dayjs'
@@ -55,9 +56,15 @@ interface Appointment {
   currentAssignedStaffId: number,
   staffDetails: Staff
 }
+
+interface TimeSlotMap {
+  timeslot: string,
+  staffs: Staff[]
+}
 const SelectDateTime = () => {
 
     const history = useHistory();
+    const location = useLocation();
     const today = dayjs();
     const { selectedDepartment } = useParams<{ selectedDepartment: string }>();
     const [staffList, setStaffList] = useState<Array<Staff>>([]);
@@ -68,6 +75,9 @@ const SelectDateTime = () => {
     const [selectedDoctorUsername, setSelectedDoctorUsername] = useState<string>('');
     const [showConfirmationAlert, setShowConfirmationAlert] = useState(false);
     const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
+    const [slotsMap, setSlotsMap] = useState<TimeSlotMap[]>([]);
+    const [error, setError] = useState('');
+    const [confirm, setConfirm] = useState<boolean>(false)
 
     const handleDateSelect = (event: CustomEvent) => {
       setSelectedDate(event.detail.value);
@@ -200,7 +210,9 @@ const SelectDateTime = () => {
           );
         });
     
-        if (slotWithinShift && !slotHasAppointment) {
+        if (startTime.getFullYear() == new Date().getFullYear() && startTime.getMonth() == new Date().getMonth() && startTime.getDate() == new Date().getDate()) {
+          console.log('same day so skip')
+        } else if (slotWithinShift && !slotHasAppointment) {
           availableTimeSlots.push({
             startTime: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             endTime: slotEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -213,8 +225,33 @@ const SelectDateTime = () => {
       return availableTimeSlots;
     }
 
-    const handleTimeSlotSelection = (staff: Staff, slot: Shift) => {
-      setSelectedTimeslot(slot.startTime + " - " + slot.endTime);
+    function compareTimeslots(a: TimeSlotMap, b: TimeSlotMap) {
+      const timeA = parseInt(a.timeslot.substring(0, 4), 10); 
+      const timeB = parseInt(b.timeslot.substring(0, 4), 10); 
+  
+      return timeA - timeB; // Compare and sort by start time
+    }
+
+    const getSlotsStaffMap = () => {
+      let timeslotToStaff: TimeSlotMap[] = []
+      availableStaffList.map((staff) => (
+        generateAvailableTimeSlots(staff, selectedDate).map(slot => {
+          const slotTime = slot.startTime + ' - ' + slot.endTime;
+          const existingObj = timeslotToStaff.find((obj: TimeSlotMap) => obj.timeslot === slotTime)
+          if (existingObj) {
+            existingObj.staffs.push(staff)
+          } else {
+            timeslotToStaff.push( { timeslot: slotTime, staffs: [staff]})
+          }
+        })
+      ))
+      setSlotsMap(timeslotToStaff.sort(compareTimeslots))
+    }
+
+    const handleTimeSlotSelection = (staffs: Staff[], slot: string) => {
+      const randomIndex = Math.floor(Math.random() * staffs.length)
+      const staff = staffs[randomIndex];
+      setSelectedTimeslot(slot);
       setSelectedDoctor(staff.firstname + " " + staff.lastname)
       setSelectedDoctorUsername(staff.username)
       setShowConfirmationAlert(true);
@@ -228,10 +265,11 @@ const SelectDateTime = () => {
     }
 
     useEffect(() => {
-      getStaffListByRole();
+      if (staffList.length === 0) getStaffListByRole()
+      else getSlotsStaffMap();
       getAllAppointments();
-      getAvailabilities(new Date().toISOString());
-    }, [])
+      // getAvailabilities(new Date().toISOString());
+    }, [location.key, selectedDate])
 
     return (
         <IonPage>
@@ -254,31 +292,25 @@ const SelectDateTime = () => {
             value={selectedDate}>
             <span slot="title">Select an Appointment Date</span>
           </IonDatetime>
-          {availableStaffList.map((staff) => (
-            <div key={staff.staffId}>
-              <h5>Dr. {staff.firstname} {staff.lastname}</h5>
-              <IonGrid>
-                {generateAvailableTimeSlots(staff, selectedDate).map((slot, index) => (
-                  <IonCol>
-                    <IonButton 
-                      fill="outline" 
-                      style={{ width: '40%'}} 
-                      key={index}
-                      onClick={() => handleTimeSlotSelection(staff, slot)}
-                    >
-                      {slot.startTime} - {slot.endTime}
-                    </IonButton>
-                  </IonCol>
-                ))}
-              </IonGrid>
-            </div>
+          <br/>
+          {slotsMap.map((slot, index) => (
+            <IonCol key={index}>
+              <IonButton 
+                fill="outline" 
+                style={{ width: '40%'}} 
+                key={index}
+                onClick={() => handleTimeSlotSelection(slot.staffs, slot.timeslot)}
+              >
+                {slot.timeslot}
+              </IonButton>
+          </IonCol>
           ))}
-          {availableStaffList.length === 0 ? 
+          {(availableStaffList.length === 0 || selectedDate == dayjs().toISOString()) ? 
           <IonText>No timeslots available today!</IonText> : null}
           <IonAlert
               isOpen={showConfirmationAlert}
               onDidDismiss={() => setShowConfirmationAlert(false)}
-              header= {`Confirm Timeslot with Dr ${selectedDoctor}`}
+              header= {`Confirm Timeslot`}
               subHeader={`${dayjs(selectedDate).format('DD/MM/YYYY')}, ${selectedTimeslot}`}
               buttons={[
                 {
@@ -295,14 +327,19 @@ const SelectDateTime = () => {
                     try {
                       const username = localStorage.getItem('username') ?? '';
                       const response = await appointmentApi.createAppointment(data.reason, convertToDate(selectedDate,selectedTimeslot), dayjs().add(8, 'hours').toISOString().slice(0, dayjs().toISOString().length-2), 'LOW', username, selectedDepartment, selectedDoctorUsername);
-                      console.log(response)
                       if (response.status === 200) {
-        
-                        history.push('/appointments', { successMessage: "Appointment successfully booked!"})
+                        data.reason = '';
+                        setConfirm(true);
                       }
-                    } catch (error) {
-                      console.log(error)
+                    } catch (error: any) {
+                      if (error.response.data && error.response.data === "Unable to create appointment, overlapping appointment exists.") {
+                        setError(error.response.data)
+                      } else if (error.response.data) {
+                        data.reason = ''
+                        setConfirm(true)
+                      }
                     }
+                    
                     setShowConfirmationAlert(false);
                   },
                 },
@@ -319,6 +356,27 @@ const SelectDateTime = () => {
                 },
               ]}
             />
+             <IonAlert 
+                isOpen={confirm}
+                onDidDismiss={() => setConfirm(false)}
+                header={'Appointment confirmed!'}
+                buttons={[
+                  {
+                    text: 'Ok',
+                    handler: () => {
+                      history.push('/appointments', { message: '' })
+                      setConfirm(false)
+                      setSelectedDate(dayjs().toISOString())
+                    }
+                  }
+                ]}
+              />
+            <IonToast 
+                isOpen={error.length > 0}
+                message={error} 
+                onDidDismiss={() => setError('')}
+                color="warning"
+                duration={3000}></IonToast>
           </IonContent>
           <Navbar />
         </IonPage>

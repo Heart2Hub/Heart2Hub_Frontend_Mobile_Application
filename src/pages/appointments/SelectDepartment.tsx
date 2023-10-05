@@ -32,7 +32,7 @@ interface Department {
   unitId: number,
   name: string
 }
-const BookAppointment = () => {
+const SelectDepartment = () => {
 
     const history = useHistory();
     const [departments, setDepartments] = useState<Array<Department>>([]);
@@ -86,4 +86,4 @@ const BookAppointment = () => {
       );
 }
 
-export default BookAppointment;
+export default SelectDepartment;

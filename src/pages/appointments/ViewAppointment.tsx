@@ -84,18 +84,22 @@ const ViewAppointment = () => {
             </IonHeader>
           <IonContent className="ion-padding">
           
-           <IonText style={{ fontSize: "20px"}}><b>{state?.message}</b></IonText><br/>
+           <IonText style={{ fontSize: "20px"}}><b>Appointment</b></IonText><br/>
            <IonText>Appointment ID: {state?.appointmentId}</IonText><br/><br/>
            <IonImg
             src={heartLogo}
             alt="Heart2Hub"
           ></IonImg>
            {state && state.actualDateTime && <>
+            <IonText style={{ fontSize: "18px"}}><b><u>{state?.department} Department</u></b></IonText><br/>
+            {state?.staffDetails ? <IonText style={{ fontSize: "16px"}}><b>Assigned doctor: </b>Dr {state?.staffDetails.firstname + ' ' + state?.staffDetails.lastname}</IonText> :
+           null}
+            <br/><br/>
+
            <IonText style={{ fontSize: "16px"}}><b>Date: </b>{getDateTime(state?.actualDateTime).split(' ')[0]}</IonText><br/>
            <IonText style={{ fontSize: "16px"}}><b>Time: </b>{getDateTime(state?.actualDateTime).split(' ')[1]}</IonText></>}<br/><br/>
-           <IonText style={{ fontSize: "18px"}}><b>{state?.department}</b></IonText><br/>
            <IonText style={{ fontSize: "16px"}}><b>Arrived: </b>{state?.arrived ? "Yes" : "No"}</IonText><br/><br/>
-           <IonText style={{ fontSize: "16px"}}>Notes: {state?.description ? state?.description : '-'}</IonText><br/><br/>
+           <IonText style={{ fontSize: "16px"}}><b>Notes:</b> {state?.description ? state?.description : '-'}</IonText><br/><br/>
            <IonCard>
             <IonCardHeader>
               <IonCardSubtitle>Pre-appointment instructions</IonCardSubtitle>
@@ -110,6 +114,7 @@ const ViewAppointment = () => {
               </li>
             </IonCardContent>
           </IonCard>
+          <IonText style={{ fontSize: "16px"}}><b>Address:</b> <br/> 21 Lower Kent Ridge Rd, Blk H2 #02-05, Singapore 119077</IonText><br/><br/>
           </IonContent>
           <Navbar />
         </IonPage>
