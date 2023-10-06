@@ -36,7 +36,7 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import Login from "./pages/Login";
-import AddNextOfKin from "./pages/Register/AddNextOfKin";
+import AddNextOfKin from "./pages/ehr/AddNextOfKin";
 import EnterNric from "./pages/Register/EnterNric";
 import CreateEhr from "./pages/Register/CreateEhr";
 import CreatePatientAccount from "./pages/Register/CreatePatientAccount";
@@ -48,43 +48,71 @@ import Appointments from "./pages/appointments";
 import SelectDepartment from "./pages/appointments/SelectDepartment";
 import SelectDateTime from "./pages/appointments/SelectDateTime";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
-
+import EHR from "./pages/ehr";
+import GeneralInformation from "./pages/ehr/GeneralInformation";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const routes = [
-      {
-        "path": "/home",
-        "component": <Home />
-      },
-      {
-        "path": "/settings",
-        "component": <Settings />
-      },
-      {
-        "path": "/settings/change-password",
-        "component": <ChangePassword />
-      },
-      {
-        "path": "/appointments",
-        "component": <Appointments />
-      },
-      {
-        "path": "/appointments/:id",
-        "component": <ViewAppointment />
-      },
-      {
-        "path": "/appointments/select-department",
-        "component": <SelectDepartment />
-      },
-      {
-        "path": "/appointments/select-date-time/:selectedDepartment",
-        "component": <SelectDateTime />
-      },
-    ]
+    {
+      path: "/register/enter-nric",
+      component: <EnterNric />,
+    },
+    {
+      path: "/register/create-ehr",
+      component: <CreateEhr />,
+    },
+    {
+      path: "/register/create-patient-account",
+      component: <CreatePatientAccount />,
+    },
+    {
+      path: "/register/confirmation",
+      component: <Confirmation />,
+    },
+    {
+      path: "/home",
+      component: <Home />,
+    },
+    {
+      path: "/ehr",
+      component: <EHR />,
+    },
+    {
+      path: "/ehr/next-of-kin",
+      component: <AddNextOfKin />,
+    },
+    {
+      path: "/ehr/general-information",
+      component: <GeneralInformation />,
+    },
+    {
+      path: "/settings",
+      component: <Settings />,
+    },
+    {
+      path: "/settings/change-password",
+      component: <ChangePassword />,
+    },
+    {
+      path: "/appointments",
+      component: <Appointments />,
+    },
+    {
+      path: "/appointments/:id",
+      component: <ViewAppointment />,
+    },
+    {
+      path: "/appointments/select-department",
+      component: <SelectDepartment />,
+    },
+    {
+      path: "/appointments/select-date-time/:selectedDepartment",
+      component: <SelectDateTime />,
+    },
+  ];
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -94,44 +122,49 @@ const App: React.FC = () => {
       const token = localStorage.getItem("accessToken");
       setIsAuthenticated(!!token);
     });
-  }, [])
+  }, []);
 
   return (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/">
-          {isAuthenticated ? <Home /> : <Login />}
-        </Route>
-        <Route exact path="/login">
-        {!isAuthenticated ? <Login /> : <Home />}
-        </Route>
-        <Route exact path="/home">
-          {isAuthenticated ? <Home /> : <Login />}
-        </Route>
-        <Route exact path="/register/enter-nric">
-          <EnterNric />
-        </Route>
-        <Route exact path="/register/create-ehr">
-          <CreateEhr />
-        </Route>
-        <Route exact path="/register/create-patient-account">
-          <CreatePatientAccount />
-        </Route>
-        <Route exact path="/register/add-next-of-kin">
-          <AddNextOfKin />
-        </Route>
-        <Route exact path="/register/confirmation">
-          <Confirmation />
-        </Route>
-        {routes.map(route => 
-          <Route exact path={route.path}>
-            {isAuthenticated ? route.component : <Login />}
-          </Route>)}
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/">
+            {isAuthenticated ? <Home /> : <Login />}
+          </Route>
+          <Route exact path="/login">
+            {!isAuthenticated ? <Login /> : <Home />}
+          </Route>
+          {/* <Route exact path="/home">
+            {isAuthenticated ? <Home /> : <Login />}
+          </Route>
+          <Route exact path="/register/enter-nric">
+            <EnterNric />
+          </Route>
+          <Route exact path="/register/create-ehr">
+            <CreateEhr />
+          </Route>
+          <Route exact path="/register/create-patient-account">
+            <CreatePatientAccount />
+          </Route>
+          <Route exact path="/register/add-next-of-kin">
+            <AddNextOfKin />
+          </Route>
+          <Route exact path="/register/confirmation">
+            <Confirmation />
+          </Route> */}
+          {routes.map((route) => (
+            <Route exact path={route.path}>
+              {isAuthenticated || route.path.split("/")[1] === "register" ? (
+                route.component
+              ) : (
+                <Login />
+              )}
+            </Route>
+          ))}
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
   );
-}
+};
 
 export default App;

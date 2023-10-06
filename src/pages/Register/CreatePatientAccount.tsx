@@ -33,46 +33,39 @@ const CreatePatientAccount: React.FC = () => {
     control,
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitSuccessful },
     reset,
     setError,
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
   const history = useHistory();
-  const location: any = useLocation();
-  console.log(location.state);
-
-  const [displayText, setDisplayText] = useState("");
-
-  // useEffect(() => {
-  //   if ("address" in location.state) {
-  //     setDisplayText("Your EHR has been successfully created!");
-  //   } else {
-  //     setDisplayText("We found an existing record in NEHR!");
-  //   }
-  // }, []);
+  // const storedEhr = localStorage.getItem("ehr");
+  // if (storedEhr !== null) {
+  //   console.log(JSON.parse(storedEhr));
+  // }
 
   const onSubmit = handleSubmit(async (data) => {
+    //console.log(data);
     try {
-      let response;
-      if ("address" in location.state) {
+      const storedEhr = localStorage.getItem("ehr");
+      if (storedEhr) {
         const requestBody = {
           newPatient: data,
-          newElectronicHealthRecord: location.state,
+          newElectronicHealthRecord: JSON.parse(storedEhr),
         };
-        response = await patientApi.createPatientWithoutNehr(requestBody);
+        await patientApi.createPatientWithoutNehr(requestBody);
       } else {
-        response = await patientApi.createPatientWithNehr(
-          data,
-          location.state.nric
-        );
+        const nric = localStorage.getItem("nric");
+        if (nric) {
+          await patientApi.createPatientWithNehr(data, nric);
+        }
       }
-      reset();
-      //console.log(response.data);
-      history.push({
-        pathname: "/register/add-next-of-kin",
-        state: response.data,
-      });
+      history.push("/register/confirmation");
     } catch (error: any) {
       const cleanedError = error.response.data.replace(
         /^Error Encountered:\s*/,
@@ -84,6 +77,8 @@ const CreatePatientAccount: React.FC = () => {
       });
     }
   });
+
+  useEffect(() => reset, [isSubmitSuccessful]);
 
   return (
     <IonPage>

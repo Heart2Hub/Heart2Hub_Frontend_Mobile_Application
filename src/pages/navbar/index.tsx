@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   IonContent,
   IonHeader,
@@ -12,9 +12,9 @@ import {
   IonLabel,
   IonRouterOutlet,
   IonTab,
-} from '@ionic/react';
-import { home, settings, person, book } from 'ionicons/icons'; // Import Ionicons icons
-import { Redirect, Route } from 'react-router-dom';
+} from "@ionic/react";
+import { home, settings, person, book } from "ionicons/icons"; // Import Ionicons icons
+import { Redirect, Route } from "react-router-dom";
 
 import Home from "../home/index";
 import Settings from "../settings/index";
@@ -38,27 +38,32 @@ const ProfileTab: React.FC = () => (
 );
 
 const App: React.FC = () => (
-    <IonTabBar slot="bottom">
-        <IonTabButton tab="home" href="/home">
-            <IonIcon icon={home} />
-            <IonLabel>Home</IonLabel>
-        </IonTabButton>
+  <IonTabBar slot="bottom">
+    <IonTabButton tab="home" href="/home">
+      <IonIcon icon={home} />
+      <IonLabel>Home</IonLabel>
+    </IonTabButton>
 
-        <IonTabButton tab="patient-journey" href="/patient-journey">
-            <IonIcon icon={person} />
-            <IonLabel>Patient Journey</IonLabel>
-        </IonTabButton>
+    <IonTabButton tab="patient-journey" href="/patient-journey">
+      <IonIcon icon={person} />
+      <IonLabel>Patient Journey</IonLabel>
+    </IonTabButton>
 
-        <IonTabButton tab="appointments" href="/appointments">
-            <IonIcon icon={book} />
-            <IonLabel>Appointments</IonLabel>
-        </IonTabButton>
+    <IonTabButton tab="appointments" href="/appointments">
+      <IonIcon icon={book} />
+      <IonLabel>Appointments</IonLabel>
+    </IonTabButton>
 
-        <IonTabButton tab="settings" href="/settings">
-            <IonIcon icon={settings} />
-            <IonLabel>Settings</IonLabel>
-        </IonTabButton>
-        </IonTabBar>
+    <IonTabButton tab="ehr" href="/ehr">
+      <IonIcon icon={settings} />
+      <IonLabel>EHR</IonLabel>
+    </IonTabButton>
+
+    <IonTabButton tab="settings" href="/settings">
+      <IonIcon icon={settings} />
+      <IonLabel>Settings</IonLabel>
+    </IonTabButton>
+  </IonTabBar>
 );
 
 export default App;
