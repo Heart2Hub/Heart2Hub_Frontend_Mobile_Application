@@ -69,10 +69,6 @@ const App: React.FC = () => {
       component: <CreatePatientAccount />,
     },
     {
-      path: "/register/add-next-of-kin",
-      component: <AddNextOfKin />,
-    },
-    {
       path: "/register/confirmation",
       component: <Confirmation />,
     },
@@ -83,6 +79,10 @@ const App: React.FC = () => {
     {
       path: "/ehr",
       component: <EHR />,
+    },
+    {
+      path: "/ehr/next-of-kin",
+      component: <AddNextOfKin />,
     },
     {
       path: "/ehr/general-information",

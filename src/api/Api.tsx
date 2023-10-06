@@ -35,15 +35,6 @@ export const patientApi = {
       requestBody
     );
   },
-  createNextOfKinRecordDuringCreatePatient(
-    ehrId: number,
-    newNextOfKinRecord: any
-  ) {
-    return axiosFetch.post(
-      `${REST_ENDPOINT}/patient/createNextOfKinRecordDuringCreatePatient?ehrId=${ehrId}`,
-      newNextOfKinRecord
-    );
-  },
   login(username: string, password: string) {
     return axiosFetch.post(
       `${REST_ENDPOINT}/patient/patientLogin?username=${username}&password=${password}`
@@ -112,10 +103,19 @@ export const electronicHealthRecordApi = {
       `${REST_ENDPOINT}/electronicHealthRecord/getElectronicHealthRecordByUsername?username=${username}`
     );
   },
-  updateElectronicHealthRecord(ehr: any) {
+  updateElectronicHealthRecord(ehrId: number, ehr: any) {
     return axiosFetch.put(
-      `${REST_ENDPOINT}/electronicHealthRecord/updateElectronicHealthRecord`,
+      `${REST_ENDPOINT}/electronicHealthRecord/updateElectronicHealthRecord?electronicHealthRecordId=${ehrId}`,
       ehr
+    );
+  },
+};
+
+export const nextOfKinRecordApi = {
+  createNextOfKinRecord(ehrId: number, newNextOfKinRecord: any) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/nextOfKinRecord/createNextOfKinRecord?ehrId=${ehrId}`,
+      newNextOfKinRecord
     );
   },
 };

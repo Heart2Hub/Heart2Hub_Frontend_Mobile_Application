@@ -15,7 +15,7 @@ import {
   IonItem,
   IonLabel,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
 import { useHistory } from "react-router";
 import { patientApi } from "../../api/Api";
@@ -30,23 +30,22 @@ const EnterNric: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitSuccessful },
     reset,
     setError,
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({ defaultValues: { nric: "" } });
 
   const history = useHistory();
+  console.log(localStorage);
 
   const doValidateNric = async (data: any) => {
     const nric = data.nric;
     try {
       //No existing EHR but existing NEHR
       await patientApi.validateNric(nric);
-      reset();
-      history.push({
-        pathname: "/register/create-patient-account",
-        state: { nric: nric },
-      });
+      localStorage.setItem("nric", nric);
+
+      history.push("/register/create-patient-account");
     } catch (error: any) {
       //1. Existing EHR associated with NRIC
       //2. No existing EHR and No existing NEHR
@@ -54,11 +53,9 @@ const EnterNric: React.FC = () => {
         error.response.data ===
         "Error Encountered: NEHR Record is not found. Please provide NEHR details."
       ) {
-        reset();
-        history.push({
-          pathname: "/register/create-ehr",
-          state: { nric: nric },
-        });
+        localStorage.setItem("nric", nric);
+
+        history.push("/register/create-ehr");
       } else {
         const cleanedError = error.response.data.replace(
           /^Error Encountered:\s*/,
@@ -73,6 +70,8 @@ const EnterNric: React.FC = () => {
   };
 
   const onSubmit = handleSubmit((data) => doValidateNric(data));
+
+  useEffect(() => reset(), [isSubmitSuccessful]);
 
   return (
     <IonPage>

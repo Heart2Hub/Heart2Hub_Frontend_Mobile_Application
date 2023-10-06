@@ -16,14 +16,14 @@ import React, { useState } from "react";
 import heartLogo from "../assets/heartLogo.png";
 import { patientApi } from "../api/Api";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 
 interface DecodedToken {
-  sub: string; 
-  exp: number; 
-  iat: number; 
-  roles: []
+  sub: string;
+  exp: number;
+  iat: number;
+  roles: [];
 }
 
 interface RegisterStep1 {
@@ -32,9 +32,13 @@ interface RegisterStep1 {
 }
 
 const Login: React.FC = () => {
-
   const [loginErrors, setLoginErrors] = useState();
-  const { register, control, handleSubmit, formState: { errors }} = useForm<RegisterStep1>();
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterStep1>();
   const history = useHistory();
 
   const onSubmit = (data: RegisterStep1) => {
@@ -56,34 +60,30 @@ const Login: React.FC = () => {
     }
   };
 
-
   return (
     <IonPage>
       <IonContent className="ion-padding">
-        <IonImg
-          src={heartLogo}
-          alt="Heart2Hub"
-        ></IonImg>
+        <IonImg src={heartLogo} alt="Heart2Hub"></IonImg>
         <form onSubmit={handleSubmit(onSubmit)}>
           <IonItem>
             <IonLabel position="floating">Username</IonLabel>
-              <IonInput
-                type="text"
-                {...register("username", {
-                  required: {
-                    value: true,
-                    message: "Username required",
-                  },
-                  minLength: {
-                    value: 6,
-                    message: "Username must be at least 6 characters",
-                  },
-                })}
-              ></IonInput>
-            </IonItem>
-            {errors.username && (
-              <IonText color="danger">{errors.username.message}</IonText>
-            )}
+            <IonInput
+              type="text"
+              {...register("username", {
+                required: {
+                  value: true,
+                  message: "Username required",
+                },
+                minLength: {
+                  value: 6,
+                  message: "Username must be at least 6 characters",
+                },
+              })}
+            ></IonInput>
+          </IonItem>
+          {errors.username && (
+            <IonText color="danger">{errors.username.message}</IonText>
+          )}
           <IonItem>
             <IonLabel position="floating">Password</IonLabel>
             <IonInput
@@ -100,17 +100,15 @@ const Login: React.FC = () => {
               })}
             ></IonInput>
           </IonItem>
-          <br/>
+          <br />
           {errors.password && (
             <IonText color="danger">{errors.password.message}</IonText>
           )}
-        <br />
-        {loginErrors && (
-            <IonText color="danger">{loginErrors}</IonText>
-          )}
-        <IonButton expand="block" size="large" type="submit">
-          Login
-        </IonButton>
+          <br />
+          {loginErrors && <IonText color="danger">{loginErrors}</IonText>}
+          <IonButton expand="block" size="large" type="submit">
+            Login
+          </IonButton>
         </form>
         <IonButton
           expand="block"
@@ -118,6 +116,13 @@ const Login: React.FC = () => {
           routerLink="/register/enter-nric"
         >
           Create Account
+        </IonButton>
+        <IonButton
+          expand="block"
+          size="large"
+          onClick={() => localStorage.clear()}
+        >
+          CLEAR
         </IonButton>
       </IonContent>
     </IonPage>

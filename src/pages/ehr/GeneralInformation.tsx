@@ -19,6 +19,8 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonButtons,
+  IonBackButton,
 } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
@@ -28,39 +30,73 @@ import { ErrorMessage } from "@hookform/error-message";
 import Navbar from "../navbar/index";
 import { electronicHealthRecordApi } from "../../api/Api";
 
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  sex: string;
+  dateOfBirth: string;
+  placeOfBirth: string;
+  nationality: string;
+  race: string;
+  address: string;
+  contactNumber: string;
+};
+
 const GeneralInformation: React.FC = () => {
+  const storedUsername = localStorage.getItem("username");
   const [editing, isEditing] = useState(false);
-  const [EHR, setEHR] = useState({});
-  const [date, setDate] = useState(new Date().toISOString());
-  const [dateText, setDateText] = useState("");
+  const [ehrId, setEhrId] = useState(0);
+  const [originalFormValues, setOriginalFormValues] = useState({});
+  const [dateOfBirthText, setDateOfBirthText] = useState("");
 
   const {
     control,
     register,
     handleSubmit,
-    formState: { errors, dirtyFields, isDirty },
+    formState: { errors },
     reset,
-  } = useForm<any>();
+  } = useForm<FormValues>();
 
   useEffect(() => {
-    const getDefaultValues = async (username: string) => {
+    const getElectronicHealthRecord = async (username: string) => {
       try {
         const response =
           await electronicHealthRecordApi.getElectronicHealthRecordByUsername(
             username
           );
-        return response.data;
+        const ehr = response.data;
+        setEhrId(ehr.electronicHealthRecordId);
+        setOriginalFormValues({
+          firstName: ehr.firstName,
+          lastName: ehr.lastName,
+          sex: ehr.sex,
+          dateOfBirth: ehr.dateOfBirth.replace(" ", "T"),
+          placeOfBirth: ehr.placeOfBirth,
+          nationality: ehr.nationality,
+          race: ehr.race,
+          address: ehr.address,
+          contactNumber: ehr.contactNumber,
+        });
+        setDateOfBirthText(ehr.dateOfBirth.split(" ")[0]);
+        //reset(originalFormValues);
       } catch (error) {
         console.log(error);
       }
     };
-    getDefaultValues(localStorage.username).then((data) =>
-      reset(data, { keepDirtyValues: true })
-    );
+
+    if (storedUsername) {
+      getElectronicHealthRecord(storedUsername);
+    }
   }, []);
 
-  console.log("dirtFields", dirtyFields);
-  console.log("isDirty", isDirty);
+  useEffect(() => {
+    reset(originalFormValues);
+  }, [originalFormValues]);
+
+  const cancelEdit = () => {
+    reset(originalFormValues);
+    isEditing(false);
+  };
 
   const handleSelectChange = (event: CustomEvent, field: any) => {
     field.onChange(event.detail.value);
@@ -68,7 +104,7 @@ const GeneralInformation: React.FC = () => {
 
   const handleDateChange = (event: CustomEvent, field: any) => {
     const selectedDate = event.detail.value;
-    setDate(selectedDate);
+    setDateOfBirthText(selectedDate.split("T")[0]);
     field.onChange(selectedDate);
     //console.log(field);
   };
@@ -78,9 +114,7 @@ const GeneralInformation: React.FC = () => {
     data.dateOfBirth = dateOfBirth.replace("T", " ");
     console.log(data);
     try {
-      await electronicHealthRecordApi.updateElectronicHealthRecord(data);
-      console.log("Submitted");
-      reset(data);
+      await electronicHealthRecordApi.updateElectronicHealthRecord(ehrId, data);
       isEditing(false);
     } catch (error) {
       console.log(error);
@@ -91,7 +125,10 @@ const GeneralInformation: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Create Electronic Health Record</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/ehr"></IonBackButton>
+          </IonButtons>
+          <IonTitle>General Information</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
@@ -100,21 +137,49 @@ const GeneralInformation: React.FC = () => {
             <IonInput
               label="First Name"
               labelPlacement="fixed"
-              {...register("firstName")}
+              {...register("firstName", {
+                required: {
+                  value: true,
+                  message: "First Name required",
+                },
+              })}
               readonly={!editing}
             />
           </IonItem>
+          <ErrorMessage
+            errors={errors}
+            name="firstName"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
 
           <IonItem lines="full">
             <IonInput
               label="Last Name"
               labelPlacement="fixed"
-              {...register("lastName")}
+              {...register("lastName", {
+                required: {
+                  value: true,
+                  message: "Last Name required",
+                },
+              })}
               readonly={!editing}
             />
           </IonItem>
+          <ErrorMessage
+            errors={errors}
+            name="lastName"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
 
           <Controller
+            name="sex"
+            control={control}
+            rules={{
+              required: {
+                value: true,
+                message: "Sex required",
+              },
+            }}
             render={({ field }) => (
               <IonItem lines="full">
                 {editing ? (
@@ -139,19 +204,28 @@ const GeneralInformation: React.FC = () => {
                 )}
               </IonItem>
             )}
+          />
+          <ErrorMessage
+            errors={errors}
             name="sex"
-            control={control}
+            render={({ message }) => <div className="error">{message}</div>}
           />
 
           <Controller
             name="dateOfBirth"
             control={control}
+            rules={{
+              required: {
+                value: true,
+                message: "Date of Birth required",
+              },
+            }}
             render={({ field }) => {
               //console.log(field);
 
-              const dateValue = field.value
-                ? field.value.replace(" ", "T")
-                : "";
+              // const dateValue = field.value
+              //   ? field.value.replace(" ", "T")
+              //   : "";
               //const dateText = field.value ? field.value.split("T")[0] : "";
               return (
                 <IonItem lines="full">
@@ -159,14 +233,14 @@ const GeneralInformation: React.FC = () => {
                     label="Date of Birth"
                     labelPlacement="fixed"
                     id="date"
-                    value={dateValue}
+                    value={dateOfBirthText}
                     readonly
                   ></IonInput>
                   <IonPopover trigger="date" showBackdrop={false} event="click">
                     <IonDatetime
                       presentation="date"
                       max={new Date().toISOString()}
-                      value={dateValue}
+                      value={field.value}
                       onIonChange={(e) => handleDateChange(e, field)}
                     ></IonDatetime>
                   </IonPopover>
@@ -174,17 +248,40 @@ const GeneralInformation: React.FC = () => {
               );
             }}
           />
+          <ErrorMessage
+            errors={errors}
+            name="dateOfBirth"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
 
           <IonItem lines="full">
             <IonInput
               label="Place of Birth"
               labelPlacement="fixed"
-              {...register("placeOfBirth")}
+              {...register("placeOfBirth", {
+                required: {
+                  value: true,
+                  message: "Place of Birth required",
+                },
+              })}
               readonly={!editing}
             />
           </IonItem>
+          <ErrorMessage
+            errors={errors}
+            name="placeOfBirth"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
 
           <Controller
+            name="nationality"
+            control={control}
+            rules={{
+              required: {
+                value: true,
+                message: "Nationality required",
+              },
+            }}
             render={({ field }) => (
               <IonItem lines="full">
                 {editing ? (
@@ -216,11 +313,22 @@ const GeneralInformation: React.FC = () => {
                 )}
               </IonItem>
             )}
+          />
+          <ErrorMessage
+            errors={errors}
             name="nationality"
-            control={control}
+            render={({ message }) => <div className="error">{message}</div>}
           />
 
           <Controller
+            name="race"
+            control={control}
+            rules={{
+              required: {
+                value: true,
+                message: "Race required",
+              },
+            }}
             render={({ field }) => (
               <IonItem lines="full">
                 {editing ? (
@@ -247,35 +355,66 @@ const GeneralInformation: React.FC = () => {
                 )}
               </IonItem>
             )}
+          />
+          <ErrorMessage
+            errors={errors}
             name="race"
-            control={control}
+            render={({ message }) => <div className="error">{message}</div>}
           />
 
           <IonItem lines="full">
             <IonInput
               label="Address"
               labelPlacement="fixed"
-              {...register("address")}
+              {...register("address", {
+                required: {
+                  value: true,
+                  message: "Address required",
+                },
+              })}
               readonly={!editing}
             />
           </IonItem>
+          <ErrorMessage
+            errors={errors}
+            name="address"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
 
           <IonItem lines="full">
             <IonInput
               label="Contact"
               labelPlacement="fixed"
               type="number"
-              {...register("contactNumber")}
+              {...register("contactNumber", {
+                required: {
+                  value: true,
+                  message: "Contact required",
+                },
+                min: {
+                  value: 80000000,
+                  message: "Invalid contact number",
+                },
+                max: {
+                  value: 99999999,
+                  message: "Invalid contact number",
+                },
+              })}
               readonly={!editing}
             />
           </IonItem>
+          <ErrorMessage
+            errors={errors}
+            name="contactNumber"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
 
           {editing ? (
             <>
               <IonButton type="submit" className="ion-margin-top">
                 Save
               </IonButton>
-              <IonButton onClick={() => reset()} className="ion-margin-top">
+              <IonButton onClick={cancelEdit} className="ion-margin-top">
                 Cancel
               </IonButton>
             </>

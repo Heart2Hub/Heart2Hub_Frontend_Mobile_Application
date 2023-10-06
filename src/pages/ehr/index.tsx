@@ -25,7 +25,7 @@ const EHR: React.FC = () => {
         <IonCard onClick={() => history.push("/ehr/general-information")}>
           <IonCardContent>General information</IonCardContent>
         </IonCard>
-        <IonCard>
+        <IonCard onClick={() => history.push("/ehr/next-of-kin")}>
           <IonCardContent>Next of Kin</IonCardContent>
         </IonCard>
         <IonCard>
