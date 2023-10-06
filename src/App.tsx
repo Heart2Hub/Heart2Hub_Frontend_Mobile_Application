@@ -36,7 +36,7 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import Login from "./pages/Login";
-import AddNextOfKin from "./pages/Register/AddNextOfKin";
+import AddNextOfKin from "./pages/ehr/AddNextOfKin";
 import EnterNric from "./pages/Register/EnterNric";
 import CreateEhr from "./pages/Register/CreateEhr";
 import CreatePatientAccount from "./pages/Register/CreatePatientAccount";
