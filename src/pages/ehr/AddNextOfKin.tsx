@@ -24,7 +24,7 @@ import {
   nextOfKinRecordApi,
 } from "../../api/Api";
 import { InputChangeEventDetail } from "@ionic/core";
-import "./styles.css";
+import "../Register/styles.css";
 import { useForm, useFieldArray, useWatch, Control } from "react-hook-form";
 
 interface NextOfKinRecord {

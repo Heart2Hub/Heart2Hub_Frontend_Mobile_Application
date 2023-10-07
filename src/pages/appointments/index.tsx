@@ -215,7 +215,7 @@ const Appointments = () => {
               <IonText style={{ fontSize: "16px"}}>{appointment.departmentName}</IonText>
               <IonList> 
                 <IonItem>
-                <IonIcon slot="start" icon={timerOutline} />
+                  <IonIcon slot="start" icon={timerOutline} />
                   <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[0] + ' ' + getDateTime(appointment.actualDateTime).split(" ")[1]}</IonLabel>
                 </IonItem>
                 <IonItem>
@@ -237,8 +237,12 @@ const Appointments = () => {
             <IonText style={{ fontSize: "16px"}}>{appointment.departmentName}</IonText>
               <IonList> 
                 <IonItem>
-                <IonIcon slot="start" icon={timerOutline} />
-                  <IonLabel>{getDateTime(appointment.actualDateTime)}</IonLabel>
+                  <IonIcon slot="start" icon={timerOutline} />
+                  <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[0] + ' ' + getDateTime(appointment.actualDateTime).split(" ")[1]}</IonLabel>
+                </IonItem>
+                <IonItem>
+                <IonIcon slot="start" />
+                  <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[2]}</IonLabel>
                 </IonItem>
               </IonList>
             </IonCardContent>

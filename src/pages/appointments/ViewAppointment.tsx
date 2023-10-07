@@ -26,13 +26,16 @@ import {
     IonCardSubtitle,
     IonCardTitle,
     IonThumbnail,
+    IonAlert,
+    IonToast,
   } from "@ionic/react";
 import Navbar from '../navbar/index';
-import { personCircle, logOut, repeat, checkmarkCircleOutline } from 'ionicons/icons';
+import { pencil, pencilOutline, pencilSharp, personCircleOutline, trashBin, trashBinOutline } from 'ionicons/icons';
 import { Route, Redirect, useHistory, useParams, useLocation } from 'react-router';
-import { departmentApi } from '../../api/Api';
+import { appointmentApi, departmentApi } from '../../api/Api';
 import dayjs from 'dayjs';
 import heartLogo from "../../assets/heartLogo.png";
+import SelectDateTime from './SelectDateTime';
 
 type Props = {}
 
@@ -56,12 +59,20 @@ interface Staff {
     name: string
   }
 }
+
 const ViewAppointment = () => {
 
     const history = useHistory();
     const { id } = useParams<{ id: string }>();
     const { state } = useLocation<Appointment>();
 
+    const [open, setOpen] = useState(false);
+    const [confirm, setConfirm] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
+
+    const handleEdit = () => {
+      history.push(`/appointments/${id}/edit`, { department: state?.department, actualDateTime: state?.actualDateTime, appointmentId: id })
+    }
     const getDateTime = (dateTime: string[]) => {
       const d = dayjs()
       .year(Number(dateTime[0]))
@@ -70,6 +81,31 @@ const ViewAppointment = () => {
       .hour(Number(dateTime[3]))
       .minute(Number(dateTime[4]))
       return dayjs(d).format('DD/MM/YYYY HH:mm')
+    }
+
+    const handleDelete = async () => {
+      try {
+        const response = await appointmentApi.deleteAppointment(Number(id));
+        if (response.status === 200) {
+          setConfirm(true);
+          setErrorMsg('');
+        } 
+      } catch (error: any) {
+        console.log(error.response.data)
+        setErrorMsg(error.response.data)
+      }
+    }
+
+    const isAppointmentPast = (dt: string[]) => {
+      if (!dt) return false;
+      const [year, month, day, hour, minute] = dt.map(Number);
+
+      const targetDate = dayjs().set('year', year).set('month', month-1).set('day', day-1).set('hour', hour).set('minute', minute);
+      const currentDate = dayjs();
+      if (currentDate.isAfter(targetDate)) {
+        return true;
+      } 
+      return false;
     }
 
     return (
@@ -84,7 +120,22 @@ const ViewAppointment = () => {
             </IonHeader>
           <IonContent className="ion-padding">
           
-           <IonText style={{ fontSize: "20px"}}><b>Appointment</b></IonText><br/>
+          <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+           <IonText style={{ fontSize: "20px"}}>
+            <b>Appointment</b>
+            </IonText>
+            <IonText>
+            {!isAppointmentPast(state?.actualDateTime) ? 
+            <>
+            <IonText style={{ fontSize: "15px", color: 'blue'}} onClick={handleEdit}>
+              <IonIcon style={{ fontSize: '18px', marginLeft: '10px' }}icon={pencilOutline} color="primary"/>
+            </IonText>
+            <IonText style={{ fontSize: "15px", color: 'blue'}} onClick={() => setOpen(true)}>
+              <IonIcon style={{ fontSize: '18px', marginLeft: '10px' }}icon={trashBinOutline} color="danger"/>
+            </IonText>
+              </> : null}
+            </IonText>
+           </div>
            <IonText>Appointment ID: {state?.appointmentId}</IonText><br/><br/>
            <IonImg
             src={heartLogo}
@@ -115,6 +166,49 @@ const ViewAppointment = () => {
             </IonCardContent>
           </IonCard>
           <IonText style={{ fontSize: "16px"}}><b>Address:</b> <br/> 21 Lower Kent Ridge Rd, Blk H2 #02-05, Singapore 119077</IonText><br/><br/>
+          <IonAlert 
+            isOpen={open}
+            onDidDismiss={() => setOpen(false)}
+            header={'Are you sure you want to cancel this appointment?'}
+            buttons={[
+              {
+                text: 'No',
+                role: 'cancel',
+                cssClass: 'secondary',
+                handler: () => {
+                  setOpen(false);
+                  setConfirm(true);
+                },
+              },
+              {
+                text: 'Yes',
+                handler: () => {
+                  setOpen(false);
+                  handleDelete();
+                }
+              }
+            ]}
+          />
+          <IonAlert 
+            isOpen={confirm}
+            onDidDismiss={() => setConfirm(false)}
+            header={'Appointment deleted!'}
+            buttons={[
+              {
+                text: 'Ok',
+                handler: () => {
+                  setConfirm(false);
+                  history.goBack();
+                }
+              }
+            ]}
+          />
+          <IonToast 
+              isOpen={errorMsg.length > 0}
+              message={errorMsg} 
+              onDidDismiss={() => setErrorMsg('')}
+              color="danger"
+              duration={2000}></IonToast>
           </IonContent>
           <Navbar />
         </IonPage>

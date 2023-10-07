@@ -50,6 +50,7 @@ import SelectDateTime from "./pages/appointments/SelectDateTime";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
 import EHR from "./pages/ehr";
 import GeneralInformation from "./pages/ehr/GeneralInformation";
+import EditSelectDateTime from "./pages/appointments/EditSelectDateTime";
 
 setupIonicReact();
 
@@ -111,6 +112,10 @@ const App: React.FC = () => {
     {
       path: "/appointments/select-date-time/:selectedDepartment",
       component: <SelectDateTime />,
+    },
+    {
+      path: "/appointments/:id/edit",
+      component: <EditSelectDateTime />,
     },
   ];
 

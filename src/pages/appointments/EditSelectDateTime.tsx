@@ -50,23 +50,28 @@ interface Shift {
 }
 
 interface Appointment {
+  appointmentId: number,
   description: string,
   comments: string,
   actualDateTime: string[],
+  department: string,
   currentAssignedStaffId: number,
-  staffDetails?: Staff
+  message: string,
+  arrived: boolean,
+  staffDetails: Staff
 }
 
 interface TimeSlotMap {
   timeslot: string,
   staffs: Staff[]
 }
-const SelectDateTime = () => {
+const EditSelectDateTime = () => {
 
     const history = useHistory();
     const location = useLocation();
     const today = dayjs();
-    const { selectedDepartment } = useParams<{ selectedDepartment: string }>();
+    const { state } = useLocation<Appointment>();
+    const [selectedDepartment, setSelectedDepartment] = useState<string>(state?.department)
     const [staffList, setStaffList] = useState<Array<Staff>>([]);
     const [availableStaffList, setAvailableStaffList] = useState<Array<Staff>>([]); 
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().toISOString());
@@ -263,6 +268,7 @@ const SelectDateTime = () => {
     }
 
     const formatDate = (dateTime: string[]) => {
+      if (!dateTime) return "";
       const d = dayjs()
         .year(Number(dateTime[0]))
         .month(Number(dateTime[1])-1)
@@ -284,15 +290,15 @@ const SelectDateTime = () => {
             <IonHeader>
                 <IonToolbar>
                   <IonButtons slot="start">
-                    <IonBackButton></IonBackButton>
+                  <IonBackButton></IonBackButton>
                     </IonButtons>
-                    <IonTitle>Make New Appointment</IonTitle>
+                    <IonTitle>Update Appointment</IonTitle>
                     <IonButtons slot="end">
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
           <IonContent className="ion-padding">
-          <IonLabel style={{ fontSize: "20px",}}><b>2. Select a timeslot</b></IonLabel><br/>
+          <IonLabel style={{ fontSize: "20px",}}><b>Current timeslot: {formatDate(state?.actualDateTime)}</b></IonLabel><br/>
           <IonLabel style={{ fontSize: "18px",}}><u>Department: {selectedDepartment}</u></IonLabel><br/><br/>
           <IonDatetime 
             presentation="date" 
@@ -320,7 +326,7 @@ const SelectDateTime = () => {
           <IonAlert
               isOpen={showConfirmationAlert}
               onDidDismiss={() => setShowConfirmationAlert(false)}
-              header= {`Confirm Timeslot`}
+              header= {`Update Timeslot`}
               subHeader={`${dayjs(selectedDate).format('DD/MM/YYYY')}, ${selectedTimeslot}`}
               buttons={[
                 {
@@ -336,15 +342,16 @@ const SelectDateTime = () => {
                   handler: async (data: any) => {
                     try {
                       const username = localStorage.getItem('username') ?? '';
-                      const response = await appointmentApi.createAppointment(data.reason, convertToDate(selectedDate,selectedTimeslot), dayjs().add(8, 'hours').toISOString().slice(0, dayjs().toISOString().length-2), 'LOW', username, selectedDepartment, selectedDoctorUsername);
+                      const response = await appointmentApi.updateAppointment(state?.appointmentId, data.reason, convertToDate(selectedDate,selectedTimeslot), username, selectedDoctorUsername);
                       if (response.status === 200) {
                         data.reason = '';
                         setConfirm(true);
                       }
                     } catch (error: any) {
-                      if (error.response.data && error.response.data === "Unable to create appointment, overlapping appointment exists.") {
+                      if (error.response.data && error.response.data === "Unable to update appointment, overlapping appointment exists.") {
                         setError(error.response.data)
                       } else if (error.response.data) {
+                        console.log(error)
                         data.reason = ''
                         setConfirm(true)
                       }
@@ -369,7 +376,7 @@ const SelectDateTime = () => {
              <IonAlert 
                 isOpen={confirm}
                 onDidDismiss={() => setConfirm(false)}
-                header={'Appointment confirmed!'}
+                header={'Appointment updated!'}
                 buttons={[
                   {
                     text: 'Ok',
@@ -393,4 +400,4 @@ const SelectDateTime = () => {
       );
 }
 
-export default SelectDateTime;
+export default EditSelectDateTime;

@@ -77,6 +77,24 @@ export const appointmentApi = {
       `${REST_ENDPOINT}/appointment/createNewAppointmentWithStaff?description=${description}&actualDateTime=${actualDate}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
     );
   },
+  updateAppointment(
+    id: number,
+    description: string,
+    actualDate: string,
+    patientUsername: string,
+    staffUsername: string
+  ) {
+    return axiosFetch.put(
+      `${REST_ENDPOINT}/appointment/updateAppointment?appointmentId=${id}&description=${description}&actualDateTime=${actualDate}&patientUsername=${patientUsername}&staffUsername=${staffUsername}`
+    );
+  },
+  deleteAppointment(
+    id: number
+  ) {
+    return axiosFetch.delete(
+      `${REST_ENDPOINT}/appointment/cancelAppointment?appointmentId=${id}`
+    );
+  },
   viewPatientAppointments(username: string) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/appointment/viewPatientAppointments?patientUsername=${username}`
@@ -92,7 +110,7 @@ export const appointmentApi = {
     departmentName: string
   ) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}`
+      `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}&selectStaffId=0`
     );
   },
 };
