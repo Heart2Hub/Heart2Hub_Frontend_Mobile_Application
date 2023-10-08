@@ -91,7 +91,6 @@ const ViewAppointment = () => {
           setErrorMsg('');
         } 
       } catch (error: any) {
-        console.log(error.response.data)
         setErrorMsg(error.response.data)
       }
     }
@@ -142,9 +141,9 @@ const ViewAppointment = () => {
             alt="Heart2Hub"
           ></IonImg>
            {state && state.actualDateTime && <>
-            <IonText style={{ fontSize: "18px"}}><b><u>{state?.department} Department</u></b></IonText><br/>
-            {state?.staffDetails ? <IonText style={{ fontSize: "16px"}}><b>Assigned doctor: </b>Dr {state?.staffDetails.firstname + ' ' + state?.staffDetails.lastname}</IonText> :
-           null}
+            <IonText style={{ fontSize: "18px"}}><b><u>{state?.department} Department</u></b></IonText>
+            {/* {state?.staffDetails ? <IonText style={{ fontSize: "16px"}}><b>Assigned doctor: </b>Dr {state?.staffDetails.firstname + ' ' + state?.staffDetails.lastname}</IonText> : */}
+           {/* null} */}
             <br/><br/>
 
            <IonText style={{ fontSize: "16px"}}><b>Date: </b>{getDateTime(state?.actualDateTime).split(' ')[0]}</IonText><br/>
@@ -162,6 +161,14 @@ const ViewAppointment = () => {
               </li>
               <li>
               Ensure you have 7 hours of uninterrupted rest before your appointment.
+              </li>
+              <li>
+              If this is your first visit, please bring along the items listed above and:
+              <ul>
+                <li>Referral letter from your polyclinic / other healthcare institutions/ private doctor</li>
+                <li>Medication, if any</li>
+                <li>X-ray and investigation records (within the last 6 months), if any</li>
+                </ul>
               </li>
             </IonCardContent>
           </IonCard>

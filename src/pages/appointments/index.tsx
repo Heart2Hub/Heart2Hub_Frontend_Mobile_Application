@@ -35,7 +35,7 @@ import Navbar from '../navbar/index';
 import { timerOutline } from 'ionicons/icons';
 import { Route, Redirect, useHistory, useLocation } from 'react-router';
 import { appointmentApi, patientApi, staffApi } from '../../api/Api';
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs';
 
 type Props = {}
 

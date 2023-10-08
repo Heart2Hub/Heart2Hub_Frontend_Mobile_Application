@@ -44,11 +44,11 @@ const Settings = () => {
   };
 
   const handleLogout = () => {
+    history.push("/");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
     window.dispatchEvent(new Event("storage"));
-    history.replace("/");
   };
 
   return (

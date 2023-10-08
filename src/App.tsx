@@ -49,8 +49,11 @@ import SelectDepartment from "./pages/appointments/SelectDepartment";
 import SelectDateTime from "./pages/appointments/SelectDateTime";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
 import EHR from "./pages/ehr";
+import Error from "./pages/error";
+import PatientJourney from "./pages/patient-journey"
 import GeneralInformation from "./pages/ehr/GeneralInformation";
 import EditSelectDateTime from "./pages/appointments/EditSelectDateTime";
+// import { createStore, get, set } from './data/IonicStorage';
 
 setupIonicReact();
 
@@ -117,6 +120,10 @@ const App: React.FC = () => {
       path: "/appointments/:id/edit",
       component: <EditSelectDateTime />,
     },
+    {
+      path: "/patient-journey",
+      component: <PatientJourney />,
+    },
   ];
 
   useEffect(() => {
@@ -162,7 +169,7 @@ const App: React.FC = () => {
               {isAuthenticated || route.path.split("/")[1] === "register" ? (
                 route.component
               ) : (
-                <Login />
+                <Error />
               )}
             </Route>
           ))}

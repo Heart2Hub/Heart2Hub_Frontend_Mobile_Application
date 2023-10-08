@@ -46,7 +46,8 @@ const SelectDepartment = () => {
     const getAllDepartments = async() => {
       try {
         const response = await departmentApi.getAllDepartments("");
-        setDepartments(response.data);
+        const departmentData = response.data.filter((d: Department) => d.name !== 'Admin');
+        setDepartments(departmentData);
       } catch (error) {
         console.log(error)
       }

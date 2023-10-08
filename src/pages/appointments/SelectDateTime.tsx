@@ -32,7 +32,7 @@ import { personCircle, logOut, repeat, checkmarkCircleOutline, time } from 'ioni
 import { Route, Redirect, useHistory, useParams, useLocation } from 'react-router';
 import { appointmentApi, departmentApi, shiftApi, staffApi } from '../../api/Api';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 
 type Props = {}
 
@@ -225,10 +225,36 @@ const SelectDateTime = () => {
     }
 
     function compareTimeslots(a: TimeSlotMap, b: TimeSlotMap) {
-      const timeA = parseInt(a.timeslot.substring(0, 4), 10); 
-      const timeB = parseInt(b.timeslot.substring(0, 4), 10); 
-  
-      return timeA - timeB; // Compare and sort by start time
+      if (a.timeslot.slice(-2) === 'AM' || a.timeslot.slice(-2) === 'PM') {
+        // Extract start times and convert to 24-hour format for comparison
+        const time1 = convertTo24Hour(a.timeslot.split(" - ")[0]);
+        const time2 = convertTo24Hour(b.timeslot.split(" - ")[0]);
+
+        // Compare the start times
+        if (time1 < time2) {
+          return -1;
+        } else {
+          return 1;
+        } 
+      } else {
+        const timeA = parseInt(a.timeslot.substring(0, 4), 10); 
+        const timeB = parseInt(b.timeslot.substring(0, 4), 10); 
+    
+        return timeA - timeB; // Compare and sort by start time
+      }
+    }
+
+    function convertTo24Hour(timeString: string) {
+      const [time, period] = timeString.split(" ");
+      let [hours, minutes] = time.split(":").map(Number);
+    
+      if (period === "PM" && hours !== 12) {
+        hours += 12;
+      } else if (period === "AM" && hours === 12) {
+        hours = 0;
+      }
+    
+      return hours * 60 + minutes;
     }
 
     const getSlotsStaffMap = () => {
@@ -256,7 +282,18 @@ const SelectDateTime = () => {
     }
 
     const convertToDate = (dateString: string, timeString: string) => {
-      const startTime = timeString.split('-')[0].trim();
+      let startTime = timeString.split('-')[0].trim();
+      // need to convert to 24 hr
+      if (startTime.slice(-2) === 'PM') {
+        let hr = Number(startTime.slice(0,2))
+        if (hr != 12) {
+          hr += 12;
+        }
+        startTime = hr + ':00';
+      } else if (startTime.slice(-2) === 'AM') {
+        let hr = startTime.slice(0,2)
+        startTime = hr + ':00';
+      }
       const origDateTime = dayjs(dateString).format('YYYY-MM-DD');
       const newDateStr = `${origDateTime}T${startTime}:00`
       return newDateStr;
@@ -307,7 +344,7 @@ const SelectDateTime = () => {
             <IonCol key={index}>
               <IonButton 
                 fill="outline" 
-                style={{ width: '40%'}} 
+                style={{ width: '45%', fontSize: '12px'}} 
                 key={index}
                 onClick={() => handleTimeSlotSelection(slot.staffs, slot.timeslot)}
               >

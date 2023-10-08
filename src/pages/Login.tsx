@@ -11,8 +11,9 @@ import {
   IonText,
   IonLabel,
   IonItem,
+  IonToast,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import heartLogo from "../assets/heartLogo.png";
 import { patientApi } from "../api/Api";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
@@ -32,7 +33,9 @@ interface RegisterStep1 {
 }
 
 const Login: React.FC = () => {
-  const [loginErrors, setLoginErrors] = useState();
+  const [loginErrors, setLoginErrors] = useState<string>('');
+  const [usernameErrors, setUsernameErrors] = useState<string>('');
+  const [pwErrors, setPwErrors] = useState<string>('');
   const {
     register,
     control,
@@ -48,17 +51,25 @@ const Login: React.FC = () => {
   const loginPatient = async (username: string, password: string) => {
     try {
       const response = await patientApi.login(username, password);
-      setLoginErrors(undefined);
+      setLoginErrors('');
       const decodedAccessToken: DecodedToken = jwt_decode(response.data);
       localStorage.setItem("accessToken", response.data);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("username", decodedAccessToken.sub);
       window.dispatchEvent(new Event("storage"));
     } catch (error: any) {
-      console.log(error);
       setLoginErrors(error.response.data);
     }
   };
+
+  useEffect(() => {
+    if(errors.username && errors.username.message && errors.username.message.length > 0) {
+      setUsernameErrors(errors.username.message)
+    }
+    else if(errors.password && errors.password.message && errors.password.message.length > 0) {
+      setPwErrors(errors.password.message)
+    }
+  })
 
   return (
     <IonPage>
@@ -81,9 +92,12 @@ const Login: React.FC = () => {
               })}
             ></IonInput>
           </IonItem>
-          {errors.username && (
-            <IonText color="danger">{errors.username.message}</IonText>
-          )}
+          <IonToast 
+              isOpen={usernameErrors.length > 0}
+              message={usernameErrors} 
+              onDidDismiss={() => setUsernameErrors('')}
+              color="danger"
+              duration={5000}></IonToast>
           <IonItem>
             <IonLabel position="floating">Password</IonLabel>
             <IonInput
@@ -101,11 +115,19 @@ const Login: React.FC = () => {
             ></IonInput>
           </IonItem>
           <br />
-          {errors.password && (
-            <IonText color="danger">{errors.password.message}</IonText>
-          )}
+          <IonToast 
+              isOpen={pwErrors.length > 0}
+              message={pwErrors} 
+              onDidDismiss={() => setPwErrors('')}
+              color="danger"
+              duration={5000}></IonToast>
           <br />
-          {loginErrors && <IonText color="danger">{loginErrors}</IonText>}
+          <IonToast 
+              isOpen={loginErrors.length > 0}
+              message={loginErrors} 
+              onDidDismiss={() => setLoginErrors('')}
+              color="danger"
+              duration={5000}></IonToast>
           <IonButton expand="block" size="large" type="submit">
             Login
           </IonButton>

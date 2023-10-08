@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     IonContent,
     IonHeader,
@@ -19,6 +19,7 @@ import {
     IonTabs,
     IonBackButton,
     IonButtons,
+    IonToast,
   } from "@ionic/react";
 import Navbar from '../navbar/index';
 import { personCircle, logOut, repeat } from 'ionicons/icons';
@@ -38,6 +39,7 @@ const Settings = () => {
 
     const [formErrors, setFormErrors] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
+    const [pwErrors, setPwErrors] = useState(false);
     const { register, control, handleSubmit, formState: { errors }} = useForm<PasswordForm>();
 
     const onSubmit = async (data: PasswordForm) => {
@@ -61,6 +63,15 @@ const Settings = () => {
         setSuccessMsg("");
       }
     }
+
+    useEffect(() => {
+      if (errors.cfmNewPassword) {
+        setPwErrors(true)
+      }
+      if (errors.newPassword) {
+        setPwErrors(true)
+      }
+    }, [errors])
 
     return (
         <IonPage>
@@ -128,15 +139,34 @@ const Settings = () => {
                 })}
               />
             </IonItem><br/>
+            {/* <IonToast 
+                isOpen={formErrors.length > 0}
+                message={formErrors} 
+                onDidDismiss={() => setFormErrors('')}
+                color="danger"
+                duration={5000}></IonToast>
+              <IonToast 
+                isOpen={pwErrors}
+                message={errors.cfmNewPassword.message ? errors.cfmNewPassword.message : 'hello'} // fck typescript
+                onDidDismiss={() => setFormErrors('')}
+                color="danger"
+                duration={5000}></IonToast> */}
+            <IonToast 
+                isOpen={successMsg.length > 0}
+                message={successMsg} 
+                onDidDismiss={() => setSuccessMsg('')}
+                color="success"
+                duration={5000}></IonToast>
+
             {errors.cfmNewPassword && (
               <IonText color="danger">{errors.cfmNewPassword.message}</IonText>
             )}<br/>
             {formErrors && formErrors.length > 0 && (
               <IonText color="danger">{formErrors}</IonText>
             )}
-            {successMsg && successMsg.length > 0 && (
+            {/* {successMsg && successMsg.length > 0 && (
               <IonText color="success">{successMsg}</IonText>
-            )}
+            )} */}
             <IonButton expand="block" type="submit">
               Change Password
             </IonButton>
