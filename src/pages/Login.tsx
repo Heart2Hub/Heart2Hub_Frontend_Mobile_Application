@@ -117,13 +117,13 @@ const Login: React.FC = () => {
         >
           Create Account
         </IonButton>
-        <IonButton
+        {/* <IonButton
           expand="block"
           size="large"
           onClick={() => localStorage.clear()}
         >
           CLEAR
-        </IonButton>
+        </IonButton> */}
       </IonContent>
     </IonPage>
   );

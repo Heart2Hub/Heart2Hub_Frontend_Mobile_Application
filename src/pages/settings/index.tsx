@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   IonContent,
   IonHeader,
@@ -17,10 +17,15 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
+  IonCard,
+  IonCardContent,
+  IonThumbnail,
 } from "@ionic/react";
 import Navbar from "../navbar/index";
 import { personCircle, logOut, repeat } from "ionicons/icons";
 import { Route, Redirect, useHistory } from "react-router";
+import { patientApi } from "../../api/Api";
+import { IMAGE_SERVER } from "../../constants/RestEndPoint";
 
 type Props = {};
 
@@ -36,8 +41,37 @@ const LogoutTab: React.FC = () => (
   </IonContent>
 );
 
+type Patient = {
+  firstName: string;
+  lastName: string;
+  profilePicture: string;
+  sex: string;
+  electronicHealthRecordId: number;
+  nric: string;
+  username: string;
+};
+
 const Settings = () => {
+  const storedUsername = localStorage.getItem("username");
   const history = useHistory();
+  const [patient, setPatient] = useState<Patient>();
+
+  useEffect(() => {
+    const getProfilePhoto = async () => {
+      try {
+        const response = await patientApi.getAllPatients();
+        const patients = response.data;
+        const currPatient = patients.filter(
+          (patient: any) => patient.username === storedUsername
+        )[0];
+        //console.log(currPatient);
+        setPatient(currPatient);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getProfilePhoto();
+  }, []);
 
   const handleChangePassword = () => {
     history.push("/settings/change-password");
@@ -59,6 +93,21 @@ const Settings = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <IonCard color="secondary">
+          <IonCardContent>
+            <IonItem lines="none" color="secondary">
+              <IonThumbnail
+                slot="start"
+                style={{ width: "72px", height: "72px" }}
+              >
+                <img
+                  src={IMAGE_SERVER + "/images/id/" + patient?.profilePicture}
+                />
+              </IonThumbnail>
+              <IonLabel>{patient?.nric}</IonLabel>
+            </IonItem>
+          </IonCardContent>
+        </IonCard>
         <IonItem>
           <IonIcon
             aria-hidden="true"

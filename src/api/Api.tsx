@@ -1,5 +1,5 @@
 import axios from "axios";
-import { REST_ENDPOINT } from "../constants/RestEndPoint";
+import { ELGIN_IP, IMAGE_SERVER } from "../constants/RestEndPoint";
 
 let axiosFetch = axios.create();
 
@@ -8,41 +8,52 @@ if (localStorage.getItem("accessToken")) {
     "Bearer " + localStorage.getItem("accessToken");
 }
 
+export const imageServerApi = {
+  uploadProfilePhoto(type: string, image: FormData) {
+    return axiosFetch.post(`${IMAGE_SERVER}/upload/${type}`, image);
+  },
+};
+
 export const staffApi = {
   getStaffListByRole(role: string, unit: string) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/staff/getStaffByRole?role=${role}&unit=${unit}`
+      `${ELGIN_IP}/staff/getStaffByRole?role=${role}&unit=${unit}`
     );
   },
   getStaffById(id: number) {
-    return axiosFetch.get(`${REST_ENDPOINT}/staff/getStaffById?id=${id}`);
+    return axiosFetch.get(`${ELGIN_IP}/staff/getStaffById?id=${id}`);
   },
 };
 
 export const patientApi = {
-  validateNric(nric: string) {
-    return axiosFetch.get(`${REST_ENDPOINT}/patient/validateNric?nric=${nric}`);
+  getAllPatients() {
+    return axiosFetch.get(
+      `${ELGIN_IP}/patient/getAllPatientsWithElectronicHealthRecordSummaryByName?name`
+    );
   },
-  createPatientWithNehr(newPatient: any, nric: string) {
+  validateNric(nric: string) {
+    return axiosFetch.get(`${ELGIN_IP}/patient/validateNric?nric=${nric}`);
+  },
+  createPatientWithNehr(requestBody: any, nric: string) {
     return axiosFetch.post(
-      `${REST_ENDPOINT}/patient/createPatientWithNehr?nric=${nric}`,
-      newPatient
+      `${ELGIN_IP}/patient/createPatientWithNehr?nric=${nric}`,
+      requestBody
     );
   },
   createPatientWithoutNehr(requestBody: any) {
     return axiosFetch.post(
-      `${REST_ENDPOINT}/patient/createPatientWithoutNehr`,
+      `${ELGIN_IP}/patient/createPatientWithoutNehr`,
       requestBody
     );
   },
   login(username: string, password: string) {
     return axiosFetch.post(
-      `${REST_ENDPOINT}/patient/patientLogin?username=${username}&password=${password}`
+      `${ELGIN_IP}/patient/patientLogin?username=${username}&password=${password}`
     );
   },
   changePassword(username: string, oldPassword: string, newPassword: string) {
     return axiosFetch.put(
-      `${REST_ENDPOINT}/patient/changePassword?username=${username}&oldPassword=${oldPassword}&newPassword=${newPassword}`
+      `${ELGIN_IP}/patient/changePassword?username=${username}&oldPassword=${oldPassword}&newPassword=${newPassword}`
     );
   },
 };
@@ -50,16 +61,14 @@ export const patientApi = {
 export const departmentApi = {
   getAllDepartments(name: string) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/department/getAllDepartments?name=${name}`
+      `${ELGIN_IP}/department/getAllDepartments?name=${name}`
     );
   },
 };
 
 export const shiftApi = {
   viewOverallRoster(username: string) {
-    return axiosFetch.get(
-      `${REST_ENDPOINT}/shift/viewOverallRoster/${username}`
-    );
+    return axiosFetch.get(`${ELGIN_IP}/shift/viewOverallRoster/${username}`);
   },
 };
 
@@ -74,12 +83,12 @@ export const appointmentApi = {
     staffUsername: string
   ) {
     return axiosFetch.post(
-      `${REST_ENDPOINT}/appointment/createNewAppointmentWithStaff?description=${description}&actualDateTime=${actualDate}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
+      `${ELGIN_IP}/appointment/createNewAppointmentWithStaff?description=${description}&actualDateTime=${actualDate}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
     );
   },
   viewPatientAppointments(username: string) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/appointment/viewPatientAppointments?patientUsername=${username}`
+      `${ELGIN_IP}/appointment/viewPatientAppointments?patientUsername=${username}`
     );
   },
   viewAllAppointmentsByRange(
@@ -92,7 +101,7 @@ export const appointmentApi = {
     departmentName: string
   ) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}`
+      `${ELGIN_IP}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}`
     );
   },
 };
@@ -100,12 +109,12 @@ export const appointmentApi = {
 export const electronicHealthRecordApi = {
   getElectronicHealthRecordByUsername(username: string) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/electronicHealthRecord/getElectronicHealthRecordByUsername?username=${username}`
+      `${ELGIN_IP}/electronicHealthRecord/getElectronicHealthRecordByUsername?username=${username}`
     );
   },
   updateElectronicHealthRecord(ehrId: number, ehr: any) {
     return axiosFetch.put(
-      `${REST_ENDPOINT}/electronicHealthRecord/updateElectronicHealthRecord?electronicHealthRecordId=${ehrId}`,
+      `${ELGIN_IP}/electronicHealthRecord/updateElectronicHealthRecord?electronicHealthRecordId=${ehrId}`,
       ehr
     );
   },
@@ -114,8 +123,13 @@ export const electronicHealthRecordApi = {
 export const nextOfKinRecordApi = {
   createNextOfKinRecord(ehrId: number, newNextOfKinRecord: any) {
     return axiosFetch.post(
-      `${REST_ENDPOINT}/nextOfKinRecord/createNextOfKinRecord?ehrId=${ehrId}`,
+      `${ELGIN_IP}/nextOfKinRecord/createNextOfKinRecord?ehrId=${ehrId}`,
       newNextOfKinRecord
+    );
+  },
+  deleteNextOfKinRecord(nextOfKinRecordId: number) {
+    return axiosFetch.delete(
+      `${ELGIN_IP}/nextOfKinRecord/deleteNextOfKinRecord?nextOfKinRecordId=${nextOfKinRecordId}`
     );
   },
 };

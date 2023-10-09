@@ -36,6 +36,7 @@ type FormValues = {
 };
 
 const CreateEhr: React.FC = () => {
+  const storedNric = localStorage.getItem("nric") || "";
   const [dateOfBirthText, setDateOfBirthText] = useState("");
 
   const {
@@ -74,14 +75,9 @@ const CreateEhr: React.FC = () => {
   const onSubmit = handleSubmit((data) => {
     const dateOfBirth = data.dateOfBirth;
     data.dateOfBirth = dateOfBirth.replace("T", " ");
-    //console.log(data);
     const ehr: any = { ...data };
-    ehr.nric = localStorage.getItem("nric");
+    ehr.nric = storedNric;
     localStorage.setItem("ehr", JSON.stringify(ehr));
-    // const storedEhr = localStorage.getItem("ehr");
-    // if (storedEhr !== null) {
-    //   console.log(JSON.parse(storedEhr));
-    // }
     history.push("/register/create-patient-account");
   });
 
@@ -95,6 +91,10 @@ const CreateEhr: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
+        <h5>
+          Our system could not detect an existing NEHR for {storedNric}. Please
+          fill in the following details to create your EHR.
+        </h5>
         <form onSubmit={onSubmit}>
           <IonItem lines="full">
             <IonInput
