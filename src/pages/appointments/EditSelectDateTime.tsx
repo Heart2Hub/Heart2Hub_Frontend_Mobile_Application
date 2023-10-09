@@ -41,7 +41,9 @@ interface Staff {
   firstname: string,
   lastname: string,
   username: string,
-  shifts: Shift[]
+  shifts: Shift[],
+  listOfAssignedAppointments?: Appointment[]
+
 }
 
 interface Shift {
@@ -210,7 +212,9 @@ const EditSelectDateTime = () => {
           const appointmentEndTime = new Date(appointmentStartTime);
           appointmentEndTime.setHours(appointmentEndTime.getHours() + 1);
           return (
-            startTime >= appointmentStartTime && slotEndTime <= appointmentEndTime && appointment.currentAssignedStaffId === staff.staffId
+            startTime >= appointmentStartTime && slotEndTime <= appointmentEndTime && 
+              staff.listOfAssignedAppointments && staff.listOfAssignedAppointments.length > 0 && checkApptTimeSlots(staff.listOfAssignedAppointments, startTime)
+            // appointment.currentAssignedStaffId === staff.staffId
           );
         });
     
@@ -313,6 +317,18 @@ const EditSelectDateTime = () => {
         .hour(Number(dateTime[3]))
         .minute(Number(dateTime[4]))
       return d.format('DD/MM/YYYY HH:mm')
+    }
+
+    function checkApptTimeSlots(appts: Appointment[], startTime: Date) {
+      for (let i=0; i<appts.length; i++) {
+        let appt = appts[i];
+        let date = appt.actualDateTime.toString();
+
+        if (dayjs(date).toDate() === startTime) {
+          return false;
+        }
+      }
+      return true;
     }
 
     useEffect(() => {

@@ -28,7 +28,7 @@ import {
     IonToast,
   } from "@ionic/react";
 import Navbar from '../navbar/index';
-import { personCircle, logOut, repeat, checkmarkCircleOutline, time } from 'ionicons/icons';
+import { personCircle, logOut, repeat, checkmarkCircleOutline, time, star } from 'ionicons/icons';
 import { Route, Redirect, useHistory, useParams, useLocation } from 'react-router';
 import { appointmentApi, departmentApi, shiftApi, staffApi } from '../../api/Api';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
@@ -41,7 +41,8 @@ interface Staff {
   firstname: string,
   lastname: string,
   username: string,
-  shifts: Shift[]
+  shifts: Shift[],
+  listOfAssignedAppointments?: Appointment[]
 }
 
 interface Shift {
@@ -205,7 +206,9 @@ const SelectDateTime = () => {
           const appointmentEndTime = new Date(appointmentStartTime);
           appointmentEndTime.setHours(appointmentEndTime.getHours() + 1);
           return (
-            startTime >= appointmentStartTime && slotEndTime <= appointmentEndTime && appointment.currentAssignedStaffId === staff.staffId
+            startTime >= appointmentStartTime && slotEndTime <= appointmentEndTime && 
+              staff.listOfAssignedAppointments && staff.listOfAssignedAppointments.length > 0 && checkApptTimeSlots(staff.listOfAssignedAppointments, startTime)
+            // appointment.currentAssignedStaffId === staff.staffId
           );
         });
     
@@ -222,6 +225,18 @@ const SelectDateTime = () => {
       }
     
       return availableTimeSlots;
+    }
+
+    function checkApptTimeSlots(appts: Appointment[], startTime: Date) {
+      for (let i=0; i<appts.length; i++) {
+        let appt = appts[i];
+        let date = appt.actualDateTime.toString();
+
+        if (dayjs(date).toDate() === startTime) {
+          return false;
+        }
+      }
+      return true;
     }
 
     function compareTimeslots(a: TimeSlotMap, b: TimeSlotMap) {
