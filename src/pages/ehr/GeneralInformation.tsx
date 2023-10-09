@@ -26,7 +26,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import { useHistory, useLocation } from "react-router";
 import { ErrorMessage } from "@hookform/error-message";
-//import "./styles.css";
+//import "../Register/styles.css";
 import Navbar from "../navbar/index";
 import { electronicHealthRecordApi } from "../../api/Api";
 
@@ -78,7 +78,6 @@ const GeneralInformation: React.FC = () => {
           contactNumber: ehr.contactNumber,
         });
         setDateOfBirthText(ehr.dateOfBirth.split(" ")[0]);
-        //reset(originalFormValues);
       } catch (error) {
         console.log(error);
       }
@@ -89,9 +88,7 @@ const GeneralInformation: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    reset(originalFormValues);
-  }, [originalFormValues]);
+  useEffect(() => reset(originalFormValues), [originalFormValues]);
 
   const cancelEdit = () => {
     reset(originalFormValues);
