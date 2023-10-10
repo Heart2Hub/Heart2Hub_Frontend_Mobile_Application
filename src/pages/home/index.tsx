@@ -16,7 +16,6 @@ import {
   IonButtons,
   IonThumbnail,
 } from "@ionic/react";
-import { notificationsOutline, personCircle, settings } from "ionicons/icons";
 import { patientApi } from "../../api/Api";
 import { useHistory } from "react-router";
 import heartLogo from "../../assets/heartLogo.png";
@@ -31,6 +30,11 @@ type Patient = {
   username: string;
 };
 
+//TODO: create a 'models' folder with our diff entities
+interface Ehr {
+  firstName: string;
+  lastName: string;
+}
 const Home = () => {
   const storedUsername = localStorage.getItem("username") || "";
   const history = useHistory();

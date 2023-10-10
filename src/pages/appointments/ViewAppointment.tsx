@@ -55,7 +55,7 @@ interface Appointment {
   appointmentId: number;
   description: string;
   comments: string;
-  actualDateTime: string[];
+  bookedDateTime: string[];
   department: string;
   currentAssignedStaffId: number;
   message: string;
@@ -84,7 +84,7 @@ const ViewAppointment = () => {
   const handleEdit = () => {
     history.push(`/tabs/appointments/edit/${id}`, {
       department: state?.department,
-      actualDateTime: state?.actualDateTime,
+      bookedDateTime: state?.bookedDateTime,
       appointmentId: id,
     });
   };
@@ -143,7 +143,7 @@ const ViewAppointment = () => {
             <b>Appointment</b>
           </IonText>
           <IonText>
-            {!isAppointmentPast(state?.actualDateTime) ? (
+            {!isAppointmentPast(state?.bookedDateTime) ? (
               <>
                 <IonText
                   style={{ fontSize: "15px", color: "blue" }}
@@ -173,7 +173,7 @@ const ViewAppointment = () => {
         <br />
         <br />
         <IonImg src={heartLogo} alt="Heart2Hub"></IonImg>
-        {state && state.actualDateTime && (
+        {state && state.bookedDateTime && (
           <>
             <IonText style={{ fontSize: "18px" }}>
               <b>
@@ -187,12 +187,12 @@ const ViewAppointment = () => {
 
             <IonText style={{ fontSize: "16px" }}>
               <b>Date: </b>
-              {getDateTime(state?.actualDateTime).split(" ")[0]}
+              {getDateTime(state?.bookedDateTime).split(" ")[0]}
             </IonText>
             <br />
             <IonText style={{ fontSize: "16px" }}>
               <b>Time: </b>
-              {getDateTime(state?.actualDateTime).split(" ")[1]}
+              {getDateTime(state?.bookedDateTime).split(" ")[1]}
             </IonText>
           </>
         )}
@@ -205,7 +205,7 @@ const ViewAppointment = () => {
         <br />
         <br />
         <IonText style={{ fontSize: "16px" }}>
-          <b>Notes:</b> {state?.description ? state?.description : "-"}
+          <b>Description:</b> {state?.description ? state?.description : "-"}
         </IonText>
         <br />
         <br />

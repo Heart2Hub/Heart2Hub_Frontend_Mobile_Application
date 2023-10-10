@@ -70,12 +70,13 @@ interface Appointment {
   appointmentId: number;
   description: string;
   comments: string;
-  actualDateTime: string[];
+  bookedDateTime: string[];
   department: string;
   currentAssignedStaffId: number;
   message: string;
   arrived: boolean;
   staffDetails: Staff;
+  listOfStaffsId: number[]
 }
 
 interface TimeSlotMap {
@@ -243,20 +244,20 @@ const EditSelectDateTime = () => {
       // Check if staff has any existing appointments during this time
       const slotHasAppointment = allAppointments.some((appointment) => {
         const appointmentStartTime = new Date(
-          Number(appointment.actualDateTime[0]),
-          Number(appointment.actualDateTime[1]) - 1,
-          Number(appointment.actualDateTime[2]),
-          Number(appointment.actualDateTime[3]),
-          Number(appointment.actualDateTime[4])
+          Number(appointment.bookedDateTime[0]),
+          Number(appointment.bookedDateTime[1]) - 1,
+          Number(appointment.bookedDateTime[2]),
+          Number(appointment.bookedDateTime[3]),
+          Number(appointment.bookedDateTime[4])
         );
         const appointmentEndTime = new Date(appointmentStartTime);
         appointmentEndTime.setHours(appointmentEndTime.getHours() + 1);
         return (
           startTime >= appointmentStartTime &&
           slotEndTime <= appointmentEndTime &&
-          staff.listOfAssignedAppointments &&
-          staff.listOfAssignedAppointments.length > 0 &&
-          checkApptTimeSlots(staff.listOfAssignedAppointments, startTime)
+          appointment.listOfStaffsId &&
+          appointment.listOfStaffsId.length > 0 &&
+          appointment.listOfStaffsId[0] == staff.staffId
           // appointment.currentAssignedStaffId === staff.staffId
         );
       });
@@ -377,7 +378,7 @@ const EditSelectDateTime = () => {
   function checkApptTimeSlots(appts: Appointment[], startTime: Date) {
     for (let i = 0; i < appts.length; i++) {
       let appt = appts[i];
-      let date = appt.actualDateTime.toString();
+      let date = appt.bookedDateTime.toString();
 
       if (dayjs(date).toDate() === startTime) {
         return false;
@@ -406,7 +407,7 @@ const EditSelectDateTime = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <IonLabel style={{ fontSize: "20px" }}>
-          <b>Current timeslot: {formatDate(state?.actualDateTime)}</b>
+          <b>Current timeslot: {formatDate(state?.bookedDateTime)}</b>
         </IonLabel>
         <br />
         <IonLabel style={{ fontSize: "18px" }}>

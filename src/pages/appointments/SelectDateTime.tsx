@@ -70,9 +70,10 @@ interface Shift {
 interface Appointment {
   description: string;
   comments: string;
-  actualDateTime: string[];
+  bookedDateTime: string[];
   currentAssignedStaffId: number;
   staffDetails?: Staff;
+  listOfStaffsId: number[]
 }
 
 interface TimeSlotMap {
@@ -237,20 +238,21 @@ const SelectDateTime = () => {
       // Check if staff has any existing appointments during this time
       const slotHasAppointment = allAppointments.some((appointment) => {
         const appointmentStartTime = new Date(
-          Number(appointment.actualDateTime[0]),
-          Number(appointment.actualDateTime[1]) - 1,
-          Number(appointment.actualDateTime[2]),
-          Number(appointment.actualDateTime[3]),
-          Number(appointment.actualDateTime[4])
+          Number(appointment.bookedDateTime[0]),
+          Number(appointment.bookedDateTime[1]) - 1,
+          Number(appointment.bookedDateTime[2]),
+          Number(appointment.bookedDateTime[3]),
+          Number(appointment.bookedDateTime[4])
         );
         const appointmentEndTime = new Date(appointmentStartTime);
         appointmentEndTime.setHours(appointmentEndTime.getHours() + 1);
+
         return (
           startTime >= appointmentStartTime &&
           slotEndTime <= appointmentEndTime &&
-          staff.listOfAssignedAppointments &&
-          staff.listOfAssignedAppointments.length > 0 &&
-          checkApptTimeSlots(staff.listOfAssignedAppointments, startTime)
+          appointment.listOfStaffsId &&
+          appointment.listOfStaffsId.length > 0 &&
+          appointment.listOfStaffsId[0] == staff.staffId
           // appointment.currentAssignedStaffId === staff.staffId
         );
       });
@@ -283,7 +285,7 @@ const SelectDateTime = () => {
   function checkApptTimeSlots(appts: Appointment[], startTime: Date) {
     for (let i = 0; i < appts.length; i++) {
       let appt = appts[i];
-      let date = appt.actualDateTime.toString();
+      let date = appt.bookedDateTime.toString();
 
       if (dayjs(date).toDate() === startTime) {
         return false;
@@ -459,10 +461,6 @@ const SelectDateTime = () => {
                   const response = await appointmentApi.createAppointment(
                     data.reason,
                     convertToDate(selectedDate, selectedTimeslot),
-                    dayjs()
-                      .add(8, "hours")
-                      .toISOString()
-                      .slice(0, dayjs().toISOString().length - 2),
                     "LOW",
                     username,
                     selectedDepartment,
@@ -473,16 +471,8 @@ const SelectDateTime = () => {
                     setConfirm(true);
                   }
                 } catch (error: any) {
-                  if (
-                    error.response.data &&
-                    error.response.data ===
-                      "Unable to create appointment, overlapping appointment exists."
-                  ) {
+                  data.reason = "";
                     setError(error.response.data);
-                  } else if (error.response.data) {
-                    data.reason = "";
-                    setConfirm(true);
-                  }
                 }
 
                 setShowConfirmationAlert(false);

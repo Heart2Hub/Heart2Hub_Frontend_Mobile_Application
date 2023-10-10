@@ -16,7 +16,6 @@ import {
   IonBackButton,
   IonButtons,
 } from "@ionic/react";
-import Navbar from "../nav/index";
 import { useHistory } from "react-router";
 
 type Props = {};
