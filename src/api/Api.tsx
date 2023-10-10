@@ -128,6 +128,11 @@ export const electronicHealthRecordApi = {
       `${ELGIN_IP}/electronicHealthRecord/getElectronicHealthRecordByUsername?username=${username}`
     );
   },
+  getNehrRecord(nric: string) {
+    return axiosFetch.get(
+      `${ELGIN_IP}/electronicHealthRecord/getNehrRecord?nric=${nric}`
+    );
+  },
   updateElectronicHealthRecord(ehrId: number, ehr: any) {
     return axiosFetch.put(
       `${ELGIN_IP}/electronicHealthRecord/updateElectronicHealthRecord?electronicHealthRecordId=${ehrId}`,

@@ -43,13 +43,11 @@ type FormValues = {
   contactNumber: string;
 };
 
-const GeneralInformation: React.FC = () => {
-  const storedUsername = localStorage.getItem("username");
-  const [editing, isEditing] = useState(false);
-  const [ehrId, setEhrId] = useState(0);
+const UseNehr: React.FC = () => {
+  const storedNric = localStorage.getItem("nric") || "";
   const [originalFormValues, setOriginalFormValues] = useState({});
   const [dateOfBirthText, setDateOfBirthText] = useState("");
-  const [editToast, setEditToast] = useState(false);
+  const history = useHistory();
 
   const {
     control,
@@ -59,15 +57,12 @@ const GeneralInformation: React.FC = () => {
     reset,
   } = useForm<FormValues>();
 
+  useEffect(() => reset(originalFormValues), [originalFormValues]);
   useEffect(() => {
-    const getElectronicHealthRecord = async (username: string) => {
+    const getElectronicHealthRecord = async (nric: string) => {
       try {
-        const response =
-          await electronicHealthRecordApi.getElectronicHealthRecordByUsername(
-            username
-          );
+        const response = await electronicHealthRecordApi.getNehrRecord(nric);
         const ehr = response.data;
-        setEhrId(ehr.electronicHealthRecordId);
         setOriginalFormValues({
           firstName: ehr.firstName,
           lastName: ehr.lastName,
@@ -86,30 +81,8 @@ const GeneralInformation: React.FC = () => {
       }
     };
 
-    if (storedUsername) {
-      getElectronicHealthRecord(storedUsername);
-    }
+    getElectronicHealthRecord(storedNric);
   }, []);
-
-  useEffect(() => reset(originalFormValues), [originalFormValues]);
-
-  const cancelEdit = () => {
-    reset(originalFormValues);
-    isEditing(false);
-  };
-
-  const onSubmit = handleSubmit(async (data) => {
-    const dateOfBirth = data.dateOfBirth;
-    data.dateOfBirth = dateOfBirth.replace("T", " ");
-    console.log(data);
-    try {
-      await electronicHealthRecordApi.updateElectronicHealthRecord(ehrId, data);
-      setEditToast(true);
-      isEditing(false);
-    } catch (error) {
-      console.log(error);
-    }
-  });
 
   return (
     <IonPage>
@@ -118,17 +91,17 @@ const GeneralInformation: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/tabs/ehr"></IonBackButton>
           </IonButtons>
-          <IonTitle>General Information</IonTitle>
+          <IonTitle>Verify NEHR</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className="ion-padding">
+      <IonContent className="ion-padding">
         <div style={{ padding: "16px", textAlign: "justify" }}>
           <b>
-            Please view your EHR details below. Click on 'Edit' to change you
-            Address and Contact only.
+            We found an existing NEHR for {storedNric}. Please verify the
+            following details and click 'Agree' to proceed.
           </b>
         </div>
-        <form onSubmit={onSubmit}>
+        <form>
           <IonItem lines="full">
             <IonInput
               label="First Name"
@@ -139,7 +112,7 @@ const GeneralInformation: React.FC = () => {
                   message: "First Name required",
                 },
               })}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -153,7 +126,7 @@ const GeneralInformation: React.FC = () => {
                   message: "Last Name required",
                 },
               })}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -167,7 +140,7 @@ const GeneralInformation: React.FC = () => {
                   message: "Last Name required",
                 },
               })}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -176,7 +149,7 @@ const GeneralInformation: React.FC = () => {
               label="Date of Birth"
               labelPlacement="fixed"
               value={dateOfBirthText}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -190,7 +163,7 @@ const GeneralInformation: React.FC = () => {
                   message: "Place of Birth required",
                 },
               })}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -204,7 +177,7 @@ const GeneralInformation: React.FC = () => {
                   message: "Place of Birth required",
                 },
               })}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -218,7 +191,7 @@ const GeneralInformation: React.FC = () => {
                   message: "Place of Birth required",
                 },
               })}
-              disabled
+              readonly
             />
           </IonItem>
 
@@ -232,14 +205,9 @@ const GeneralInformation: React.FC = () => {
                   message: "Address required",
                 },
               })}
-              disabled={!editing}
+              readonly
             />
           </IonItem>
-          <ErrorMessage
-            errors={errors}
-            name="address"
-            render={({ message }) => <div className="error">{message}</div>}
-          />
 
           <IonItem lines="full">
             <IonInput
@@ -260,43 +228,33 @@ const GeneralInformation: React.FC = () => {
                   message: "Invalid contact number",
                 },
               })}
-              disabled={!editing}
+              readonly
             />
           </IonItem>
-          <ErrorMessage
-            errors={errors}
-            name="contactNumber"
-            render={({ message }) => <div className="error">{message}</div>}
-          />
-
-          {editing ? (
-            <>
-              <IonButton type="submit" className="ion-margin-top">
-                Save
-              </IonButton>
-              <IonButton onClick={cancelEdit} className="ion-margin-top">
-                Cancel
-              </IonButton>
-            </>
-          ) : (
-            <IonButton
-              onClick={() => isEditing(true)}
-              className="ion-margin-top"
-            >
-              Edit
+          <div
+            style={{
+              marginTop: "20px",
+              display: "flex",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+            }}
+          >
+            <IonButton color="danger" onClick={() => history.replace("/")}>
+              Cancel
             </IonButton>
-          )}
+            <IonButton
+              color="success"
+              onClick={() =>
+                history.replace("/register/create-patient-account")
+              }
+            >
+              Agree
+            </IonButton>
+          </div>
         </form>
-        <IonToast
-          isOpen={editToast}
-          color="success"
-          message={"Address and Contact updated"}
-          onDidDismiss={() => setEditToast(false)}
-          duration={3000}
-        ></IonToast>
       </IonContent>
     </IonPage>
   );
 };
 
-export default GeneralInformation;
+export default UseNehr;

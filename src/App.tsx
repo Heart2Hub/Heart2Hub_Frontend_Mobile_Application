@@ -52,6 +52,7 @@ import GeneralInformation from "./pages/ehr/GeneralInformation";
 import EditSelectDateTime from "./pages/appointments/EditSelectDateTime";
 // import { createStore, get, set } from './data/IonicStorage';
 import Tabs from "./nav/Tabs";
+import UseNehr from "./pages/Register/UseNehr";
 
 setupIonicReact();
 
@@ -87,11 +88,11 @@ const App: React.FC = () => {
           <Route exact path="/register/create-ehr">
             <CreateEhr />
           </Route>
+          <Route exact path="/register/use-nehr">
+            <UseNehr />
+          </Route>
           <Route exact path="/register/create-patient-account">
             <CreatePatientAccount />
-          </Route>
-          <Route exact path="/register/add-next-of-kin">
-            <AddNextOfKin />
           </Route>
           <Route exact path="/register/confirmation">
             <Confirmation />

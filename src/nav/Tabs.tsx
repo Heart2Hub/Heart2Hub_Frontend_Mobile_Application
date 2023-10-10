@@ -28,6 +28,8 @@ import EditSelectDateTime from "../pages/appointments/EditSelectDateTime";
 import GeneralInformation from "../pages/ehr/GeneralInformation";
 import AddNextOfKin from "../pages/ehr/AddNextOfKin";
 import ChangePassword from "../pages/settings/ChangePassword";
+import Problems from "../pages/ehr/Problems";
+import MedicalHistory from "../pages/ehr/MedicalHistory";
 
 const routes = [
   {
@@ -65,6 +67,14 @@ const routes = [
   {
     path: "/tabs/ehr/next-of-kin",
     component: <AddNextOfKin />,
+  },
+  {
+    path: "/tabs/ehr/problems",
+    component: <Problems />,
+  },
+  {
+    path: "/tabs/ehr/medical-history",
+    component: <MedicalHistory />,
   },
   {
     path: "/tabs/settings",

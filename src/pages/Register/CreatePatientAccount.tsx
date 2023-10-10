@@ -30,6 +30,7 @@ import moment from "moment";
 type FormValues = {
   username: string;
   password: string;
+  confirmPassword: string;
 };
 
 interface UserPhoto {
@@ -48,15 +49,19 @@ const CreatePatientAccount: React.FC = () => {
     formState: { errors, isSubmitSuccessful },
     reset,
     setError,
+    watch,
   } = useForm<FormValues>({
     defaultValues: {
       username: "",
       password: "",
+      confirmPassword: "",
     },
   });
   const history = useHistory();
 
   const onSubmit = async (data: any) => {
+    const { confirmPassword, ...patient } = data;
+
     try {
       const imageServerResponse = await imageServerApi.uploadProfilePhoto(
         "id",
@@ -72,7 +77,7 @@ const CreatePatientAccount: React.FC = () => {
         const storedEhr = localStorage.getItem("ehr");
         if (storedEhr) {
           const requestBody = {
-            newPatient: data,
+            newPatient: patient,
             newElectronicHealthRecord: JSON.parse(storedEhr),
             imageDocument: imageDocument,
           };
@@ -81,12 +86,13 @@ const CreatePatientAccount: React.FC = () => {
           const nric = localStorage.getItem("nric");
           if (nric) {
             const requestBody = {
-              newPatient: data,
+              newPatient: patient,
               imageDocument: imageDocument,
             };
             await patientApi.createPatientWithNehr(requestBody, nric);
           }
         }
+
         history.push("/register/confirmation");
       } catch (error: any) {
         const cleanedError = error.response.data.replace(
@@ -105,6 +111,8 @@ const CreatePatientAccount: React.FC = () => {
 
   useEffect(() => {
     setPhoto(undefined);
+    setPhotoFormData(undefined);
+    setPhotoError("");
     reset();
   }, [isSubmitSuccessful]);
 
@@ -148,7 +156,18 @@ const CreatePatientAccount: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
-        <h5>Enter a username and password to create your patient account.</h5>
+        <div style={{ padding: "12px", textAlign: "justify" }}>
+          <b>
+            <p>
+              Enter a username, password and upload a profile photo to create
+              your patient account.
+            </p>
+            <p>
+              Username should be at least 6 characters long. Password should be
+              at least 8 characters long.
+            </p>
+          </b>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <IonInput
             className="ion-margin-top"
@@ -172,6 +191,7 @@ const CreatePatientAccount: React.FC = () => {
             name="username"
             render={({ message }) => <div className="error">{message}</div>}
           />
+
           <IonInput
             className="ion-margin-top"
             type="password"
@@ -194,8 +214,30 @@ const CreatePatientAccount: React.FC = () => {
             name="password"
             render={({ message }) => <div className="error">{message}</div>}
           />
-          <div>
-            <h5>Profile Photo </h5>
+
+          <IonInput
+            className="ion-margin-top"
+            type="password"
+            fill="solid"
+            label="Confirm Password"
+            labelPlacement="floating"
+            {...register("confirmPassword", {
+              required: {
+                value: true,
+                message: "Confirm Password required",
+              },
+              validate: (value) => {
+                return value === watch("password") || "Passwords do not match";
+              },
+            })}
+          />
+          <ErrorMessage
+            errors={errors}
+            name="confirmPassword"
+            render={({ message }) => <div className="error">{message}</div>}
+          />
+
+          <div style={{ marginTop: "16px" }}>
             {photoError ? <div className="error">{photoError}</div> : null}
             <IonButton onClick={uploadPhoto}>Choose Image</IonButton>{" "}
           </div>

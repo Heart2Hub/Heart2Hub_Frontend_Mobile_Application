@@ -25,10 +25,12 @@ const Confirmation: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <h5>
-          Your Heart2Hub Patient Account has been created. Please head back to
-          the login page.
-        </h5>
+        <div style={{ padding: "12px", textAlign: "justify" }}>
+          <b>
+            Your Heart2Hub Patient Account has been created. Please head back to
+            the login page.
+          </b>
+        </div>
         <IonButton onClick={confirm}>Back to Login</IonButton>
       </IonContent>
     </IonPage>

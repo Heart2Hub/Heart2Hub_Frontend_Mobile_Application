@@ -45,7 +45,7 @@ const EnterNric: React.FC = () => {
       await patientApi.validateNric(nric);
       localStorage.setItem("nric", nric);
 
-      history.push("/register/create-patient-account");
+      history.push("/register/use-nehr");
     } catch (error: any) {
       //1. Existing EHR associated with NRIC
       //2. No existing EHR and No existing NEHR
@@ -77,14 +77,19 @@ const EnterNric: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/"></IonBackButton>
+          </IonButtons>
           <IonTitle>Enter NRIC</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
-        <h5>
-          Our system checks if you have an existing NEHR. Otherwise, you will be
-          required to create a new EHR in the following step.
-        </h5>
+        <div style={{ padding: "12px", textAlign: "justify" }}>
+          <b>
+            Our system checks if you have an existing NEHR. Otherwise, you will
+            be required to create a new EHR in the following step.
+          </b>
+        </div>
 
         <form onSubmit={onSubmit}>
           <IonInput

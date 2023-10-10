@@ -20,8 +20,13 @@ import {
   IonCard,
   IonCardContent,
   IonThumbnail,
+  IonAvatar,
+  IonList,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
 } from "@ionic/react";
-import { personCircle, logOut, repeat } from "ionicons/icons";
+import { personCircle, logOut, repeat, arrowForward } from "ionicons/icons";
 import { Route, Redirect, useHistory } from "react-router";
 import { patientApi } from "../../api/Api";
 import { IMAGE_SERVER } from "../../constants/RestEndPoint";
@@ -56,7 +61,7 @@ const Settings = () => {
   const [patient, setPatient] = useState<Patient>();
 
   useEffect(() => {
-    const getProfilePhoto = async () => {
+    const getPatientDetails = async () => {
       try {
         const response = await patientApi.getAllPatients();
         const patients = response.data;
@@ -69,7 +74,7 @@ const Settings = () => {
         console.log(error);
       }
     };
-    getProfilePhoto();
+    getPatientDetails();
   }, []);
 
   const handleChangePassword = () => {
@@ -88,41 +93,67 @@ const Settings = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Settings</IonTitle>
+          <IonItem className="ion-padding" lines="none">
+            <IonAvatar
+              style={{ width: "80px", height: "80px" }}
+              className="ion-margin-end"
+            >
+              <img
+                alt="Silhouette of a person's head"
+                src={IMAGE_SERVER + "/images/id/" + patient?.profilePicture}
+              />
+            </IonAvatar>
+            <IonLabel>
+              <b style={{ fontSize: "20px" }}>
+                {patient?.firstName + " " + patient?.lastName}
+              </b>
+              <p style={{ fontSize: "16px" }}>{patient?.nric}</p>
+            </IonLabel>
+          </IonItem>
+
+          {/* <IonTitle className="ion-text-center" style={{ height: "80px" }}>
+            <b>Account & Settings</b>
+          </IonTitle> */}
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <IonCard color="secondary">
-          <IonCardContent>
-            <IonItem lines="none" color="secondary">
-              <IonThumbnail
-                slot="start"
-                style={{ width: "72px", height: "72px" }}
-              >
-                <img
-                  src={IMAGE_SERVER + "/images/id/" + patient?.profilePicture}
-                />
-              </IonThumbnail>
-              <IonLabel>{patient?.nric}</IonLabel>
-            </IonItem>
-          </IonCardContent>
-        </IonCard>
-        <IonItem>
+      <IonContent color="light" className="ion-padding">
+        {/* <IonItem>
           <IonIcon
             aria-hidden="true"
             icon={personCircle}
             slot="start"
           ></IonIcon>
           <IonLabel>Profile</IonLabel>
-        </IonItem>
-        <IonItem onClick={handleChangePassword}>
-          <IonIcon aria-hidden="true" icon={repeat} slot="start"></IonIcon>
-          <IonLabel>Change password</IonLabel>
-        </IonItem>
-        <IonItem button onClick={handleLogout}>
-          <IonIcon aria-hidden="true" icon={logOut} slot="start"></IonIcon>
-          <IonLabel>Logout</IonLabel>
-        </IonItem>
+        </IonItem> */}
+        <IonCard>
+          <IonCardHeader>
+            <IonCardTitle>
+              <b>Settings</b>
+            </IonCardTitle>
+          </IonCardHeader>
+          <IonCardContent className="ion-no-padding">
+            <IonList>
+              <IonItem onClick={handleChangePassword}>
+                <IonIcon
+                  aria-hidden="true"
+                  icon={repeat}
+                  slot="start"
+                ></IonIcon>
+                <IonLabel>Change password</IonLabel>
+                <IonIcon icon={arrowForward} slot="end"></IonIcon>
+              </IonItem>
+              <IonItem onClick={handleLogout} lines="none">
+                <IonIcon
+                  aria-hidden="true"
+                  icon={logOut}
+                  slot="start"
+                ></IonIcon>
+                <IonLabel>Logout</IonLabel>
+                <IonIcon icon={arrowForward} slot="end"></IonIcon>
+              </IonItem>
+            </IonList>
+          </IonCardContent>
+        </IonCard>
       </IonContent>
     </IonPage>
   );

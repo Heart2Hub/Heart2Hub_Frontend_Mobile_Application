@@ -16,6 +16,8 @@ import {
   IonModal,
   IonText,
   IonPopover,
+  IonButtons,
+  IonBackButton,
 } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
@@ -87,14 +89,19 @@ const CreateEhr: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/register/enter-nric"></IonBackButton>
+          </IonButtons>
           <IonTitle>Create Electronic Health Record</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
-        <h5>
-          Our system could not detect an existing NEHR for {storedNric}. Please
-          fill in the following details to create your EHR.
-        </h5>
+        <div style={{ padding: "12px", textAlign: "justify" }}>
+          <b>
+            Our system could not detect an existing NEHR for {storedNric}.
+            Please fill in the following details to create your EHR.
+          </b>
+        </div>
         <form onSubmit={onSubmit}>
           <IonItem lines="full">
             <IonInput
