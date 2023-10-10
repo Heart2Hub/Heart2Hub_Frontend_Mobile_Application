@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IonContent,
   IonHeader,
@@ -16,13 +16,33 @@ import {
   IonButtons,
 } from "@ionic/react";
 import { personCircle, settings } from "ionicons/icons";
-import { patientApi } from "../../api/Api";
+import { electronicHealthRecordApi } from "../../api/Api";
 import { useHistory } from "react-router";
 
 type Props = {};
 
+//TODO: create a 'models' folder with our diff entities
+interface Ehr {
+  firstName: string,
+  lastName: string
+}
 const Home = () => {
   const history = useHistory();
+  const [patient, setPatient] = useState<Ehr>();
+
+  const getPatientDetails = async () => {
+    try {
+      const username = localStorage.getItem("username") ?? "";
+      const response = await electronicHealthRecordApi.getElectronicHealthRecordByUsername(username);
+      setPatient(response.data);
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getPatientDetails();
+  }, [])
 
   return (
     <IonPage>
@@ -36,7 +56,7 @@ const Home = () => {
           color="primary"
           style={{ fontSize: "1.7rem", fontWeight: "600" }}
         >
-          Welcome, {localStorage.getItem("username")}!
+          Welcome{patient ? ', ' + patient.firstName + ' ' + patient.lastName : null}!
         </IonText>
       </IonContent>
     </IonPage>

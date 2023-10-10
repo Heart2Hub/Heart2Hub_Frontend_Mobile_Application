@@ -55,7 +55,7 @@ export const patientApi = {
     return axiosFetch.put(
       `${ELGIN_IP}/patient/changePassword?username=${username}&oldPassword=${oldPassword}&newPassword=${newPassword}`
     );
-  },
+  }
 };
 
 export const departmentApi = {
