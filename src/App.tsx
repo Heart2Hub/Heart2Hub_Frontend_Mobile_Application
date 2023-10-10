@@ -12,9 +12,6 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { ellipse, square, triangle } from "ionicons/icons";
-import Tab1 from "./pages/Tab1";
-import Tab2 from "./pages/Tab2";
-import Tab3 from "./pages/Tab3";
 import { useEffect, useState } from "react";
 
 /* Core CSS required for Ionic components to work properly */
@@ -50,81 +47,16 @@ import SelectDateTime from "./pages/appointments/SelectDateTime";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
 import EHR from "./pages/ehr";
 import Error from "./pages/error";
-import PatientJourney from "./pages/patient-journey"
+import PatientJourney from "./pages/patient-journey";
 import GeneralInformation from "./pages/ehr/GeneralInformation";
 import EditSelectDateTime from "./pages/appointments/EditSelectDateTime";
 // import { createStore, get, set } from './data/IonicStorage';
+import Tabs from "./nav/Tabs";
 
 setupIonicReact();
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const routes = [
-    {
-      path: "/register/enter-nric",
-      component: <EnterNric />,
-    },
-    {
-      path: "/register/create-ehr",
-      component: <CreateEhr />,
-    },
-    {
-      path: "/register/create-patient-account",
-      component: <CreatePatientAccount />,
-    },
-    {
-      path: "/register/confirmation",
-      component: <Confirmation />,
-    },
-    {
-      path: "/home",
-      component: <Home />,
-    },
-    {
-      path: "/ehr",
-      component: <EHR />,
-    },
-    {
-      path: "/ehr/next-of-kin",
-      component: <AddNextOfKin />,
-    },
-    {
-      path: "/ehr/general-information",
-      component: <GeneralInformation />,
-    },
-    {
-      path: "/settings",
-      component: <Settings />,
-    },
-    {
-      path: "/settings/change-password",
-      component: <ChangePassword />,
-    },
-    {
-      path: "/appointments",
-      component: <Appointments />,
-    },
-    {
-      path: "/appointments/:id",
-      component: <ViewAppointment />,
-    },
-    {
-      path: "/appointments/select-department",
-      component: <SelectDepartment />,
-    },
-    {
-      path: "/appointments/select-date-time/:selectedDepartment",
-      component: <SelectDateTime />,
-    },
-    {
-      path: "/appointments/:id/edit",
-      component: <EditSelectDateTime />,
-    },
-    {
-      path: "/patient-journey",
-      component: <PatientJourney />,
-    },
-  ];
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -141,14 +73,14 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonRouterOutlet>
           <Route exact path="/">
-            {isAuthenticated ? <Home /> : <Login />}
+            {isAuthenticated ? <Redirect to="/tabs" /> : <Login />}
           </Route>
-          <Route exact path="/login">
-            {!isAuthenticated ? <Login /> : <Home />}
-          </Route>
-          {/* <Route exact path="/home">
-            {isAuthenticated ? <Home /> : <Login />}
-          </Route>
+          <Route
+            path="/tabs"
+            render={() => <Tabs isAuthenticated={isAuthenticated} />}
+          />
+
+          {/* REGISTER ROUTES */}
           <Route exact path="/register/enter-nric">
             <EnterNric />
           </Route>
@@ -163,16 +95,24 @@ const App: React.FC = () => {
           </Route>
           <Route exact path="/register/confirmation">
             <Confirmation />
+          </Route>
+
+          {/* <Route exact path="/">
+            {isAuthenticated ? <Home /> : <Login />}
+          </Route>
+          <Route exact path="/login">
+            {!isAuthenticated ? <Login /> : <Home />}
           </Route> */}
-          {routes.map((route) => (
+
+          {/* {routes.map((route) => (
             <Route exact path={route.path}>
               {isAuthenticated || route.path.split("/")[1] === "register" ? (
                 route.component
               ) : (
-                <Error />
+                <Redirect to="/" />
               )}
             </Route>
-          ))}
+          ))} */}
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

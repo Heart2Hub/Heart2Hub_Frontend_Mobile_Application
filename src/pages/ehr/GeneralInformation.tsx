@@ -27,7 +27,6 @@ import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import { useHistory, useLocation } from "react-router";
 import { ErrorMessage } from "@hookform/error-message";
 //import "../Register/styles.css";
-import Navbar from "../navbar/index";
 import { electronicHealthRecordApi } from "../../api/Api";
 
 type FormValues = {
@@ -123,7 +122,7 @@ const GeneralInformation: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/ehr"></IonBackButton>
+            <IonBackButton defaultHref="/tabs/ehr"></IonBackButton>
           </IonButtons>
           <IonTitle>General Information</IonTitle>
         </IonToolbar>
@@ -425,7 +424,6 @@ const GeneralInformation: React.FC = () => {
           )}
         </form>
       </IonContent>
-      <Navbar />
     </IonPage>
   );
 };

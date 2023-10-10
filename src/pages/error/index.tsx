@@ -1,43 +1,51 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react";
 import {
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonTitle,
-    IonToolbar,
-    IonInput,
-    IonImg,
-    IonButton,
-    IonFooter,
-    IonText,
-    IonLabel,
-    IonItem,
-    IonIcon,
-    IonBackButton,
-    IonButtons,
-  } from "@ionic/react";
-import Navbar from '../navbar/index';
-import { useHistory } from 'react-router';
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonInput,
+  IonImg,
+  IonButton,
+  IonFooter,
+  IonText,
+  IonLabel,
+  IonItem,
+  IonIcon,
+  IonBackButton,
+  IonButtons,
+} from "@ionic/react";
+import Navbar from "../nav/index";
+import { useHistory } from "react-router";
 
-type Props = {}
+type Props = {};
 
 const Home = () => {
-
   const history = useHistory();
 
-    return (
-        <IonPage>
-            <IonHeader>
-                <IonToolbar>
-                    <IonTitle>Error</IonTitle>
-                </IonToolbar>
-            </IonHeader>
-          <IonContent className="ion-padding">
-            <IonText color="danger" style={{ fontSize: "1.3rem", fontWeight: "600"}}>You are logged out!</IonText><br/><br/>
-            <IonButton onClick={() => history.push('/login')}>Click here to login</IonButton>
-          </IonContent>
-        </IonPage>
-      );
-}
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Error</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <IonText
+          color="danger"
+          style={{ fontSize: "1.3rem", fontWeight: "600" }}
+        >
+          You are logged out!
+        </IonText>
+        <br />
+        <br />
+        <IonButton onClick={() => history.push("/")}>
+          Click here to login
+        </IonButton>
+      </IonContent>
+    </IonPage>
+  );
+};
 
 export default Home;

@@ -8,7 +8,6 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React from "react";
-import Navbar from "../navbar/index";
 import { useHistory } from "react-router";
 
 const EHR: React.FC = () => {
@@ -22,10 +21,10 @@ const EHR: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonCard onClick={() => history.push("/ehr/general-information")}>
+        <IonCard onClick={() => history.push("/tabs/ehr/general-information")}>
           <IonCardContent>General information</IonCardContent>
         </IonCard>
-        <IonCard onClick={() => history.push("/ehr/next-of-kin")}>
+        <IonCard onClick={() => history.push("/tabs/ehr/next-of-kin")}>
           <IonCardContent>Next of Kin</IonCardContent>
         </IonCard>
         <IonCard>
@@ -38,7 +37,6 @@ const EHR: React.FC = () => {
           <IonCardContent>Medical History</IonCardContent>
         </IonCard>
       </IonContent>
-      <Navbar />
     </IonPage>
   );
 };
