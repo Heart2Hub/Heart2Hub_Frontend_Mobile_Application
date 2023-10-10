@@ -86,7 +86,7 @@ const Settings = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
     window.dispatchEvent(new Event("storage"));
-    history.push("/");
+    history.replace("/");
   };
 
   return (
