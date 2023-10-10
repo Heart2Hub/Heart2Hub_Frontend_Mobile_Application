@@ -110,14 +110,14 @@ const Appointments = () => {
       let day = dayjs(d).get('day');
       let strDay;
       switch (day) {
-        case 0: strDay = "Monday"; break;
-        case 1: strDay = "Tuesday"; break;
-        case 2: strDay = "Wednesday"; break;
-        case 3: strDay = "Thursday"; break;
-        case 4: strDay = "Friday"; break;
-        case 5: strDay = "Saturday"; break;
-        case 6: strDay = "Sunday"; break;
-        default: strDay = ''; break;
+        case 1: strDay = "Monday"; break;
+        case 2: strDay = "Tuesday"; break;
+        case 3: strDay = "Wednesday"; break;
+        case 4: strDay = "Thursday"; break;
+        case 5: strDay = "Friday"; break;
+        case 6: strDay = "Saturday"; break;
+        case 7: strDay = "Sunday"; break;
+        default: strDay = 'Sunday'; break;
 
       }
       return strDay + ', ' + dayjs(d).format('DD/MM/YYYY HH:mm')
@@ -226,7 +226,7 @@ const Appointments = () => {
             </IonCardContent>
           </IonCard>
             )} </> : <>
-            {pastAppts.map((appointment) => 
+            {/* {pastAppts.map((appointment) => 
             <IonCard onClick={() => handleClickAppt(appointment)} key={appointment.appointmentId}>
             <IonCardHeader>
               {appointment.staffDetails ? 
@@ -246,7 +246,8 @@ const Appointments = () => {
                 </IonItem>
               </IonList>
             </IonCardContent>
-          </IonCard>)}</>}
+          </IonCard>)} */}
+          </>}
           </IonContent>
           <Navbar />
         </IonPage>
