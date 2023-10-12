@@ -39,7 +39,8 @@ interface UserPhoto {
 
 const CreatePatientAccount: React.FC = () => {
   const [photo, setPhoto] = useState<UserPhoto>();
-  const [photoFormData, setPhotoFormData] = useState<FormData>();
+  const [photoFormData, setPhotoFormData] = useState<FormData | undefined>();
+  const [photoError, setPhotoError] = useState("");
   const {
     control,
     register,
@@ -57,49 +58,49 @@ const CreatePatientAccount: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      if (photoFormData) {
-        const imageServerResponse = await imageServerApi.uploadProfilePhoto(
-          "id",
-          photoFormData
-        );
+      const imageServerResponse = await imageServerApi.uploadProfilePhoto(
+        "id",
+        photoFormData
+      );
 
-        const imageDocument = {
-          imageLink: imageServerResponse.data.filename,
-          createdDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
-        };
+      const imageDocument = {
+        imageLink: imageServerResponse.data.filename,
+        createdDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
+      };
 
-        try {
-          const storedEhr = localStorage.getItem("ehr");
-          if (storedEhr) {
+      try {
+        const storedEhr = localStorage.getItem("ehr");
+        if (storedEhr) {
+          const requestBody = {
+            newPatient: data,
+            newElectronicHealthRecord: JSON.parse(storedEhr),
+            imageDocument: imageDocument,
+          };
+          await patientApi.createPatientWithoutNehr(requestBody);
+        } else {
+          const nric = localStorage.getItem("nric");
+          if (nric) {
             const requestBody = {
               newPatient: data,
-              newElectronicHealthRecord: JSON.parse(storedEhr),
               imageDocument: imageDocument,
             };
-            await patientApi.createPatientWithoutNehr(requestBody);
-          } else {
-            const nric = localStorage.getItem("nric");
-            if (nric) {
-              const requestBody = {
-                newPatient: data,
-                imageDocument: imageDocument,
-              };
-              await patientApi.createPatientWithNehr(requestBody, nric);
-            }
+            await patientApi.createPatientWithNehr(requestBody, nric);
           }
-          history.push("/register/confirmation");
-        } catch (error: any) {
-          const cleanedError = error.response.data.replace(
-            /^Error Encountered:\s*/,
-            ""
-          );
-          setError("username", {
-            type: "manual",
-            message: cleanedError,
-          });
         }
+        history.push("/register/confirmation");
+      } catch (error: any) {
+        const cleanedError = error.response.data.replace(
+          /^Error Encountered:\s*/,
+          ""
+        );
+        setError("username", {
+          type: "manual",
+          message: cleanedError,
+        });
       }
-    } catch (error) {}
+    } catch (error: any) {
+      setPhotoError(error.response.data);
+    }
   };
 
   useEffect(() => {
@@ -195,6 +196,7 @@ const CreatePatientAccount: React.FC = () => {
           />
           <div>
             <h5>Profile Photo </h5>
+            {photoError ? <div className="error">{photoError}</div> : null}
             <IonButton onClick={uploadPhoto}>Choose Image</IonButton>{" "}
           </div>
 

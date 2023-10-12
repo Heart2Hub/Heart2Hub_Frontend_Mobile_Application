@@ -273,7 +273,7 @@ const AddNextOfKin: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/ehr"></IonBackButton>
+            <IonBackButton defaultHref="/tabs/ehr"></IonBackButton>
           </IonButtons>
           <IonTitle>Add Next of Kin</IonTitle>
         </IonToolbar>

@@ -9,7 +9,7 @@ if (localStorage.getItem("accessToken")) {
 }
 
 export const imageServerApi = {
-  uploadProfilePhoto(type: string, image: FormData) {
+  uploadProfilePhoto(type: string, image: FormData | undefined) {
     return axiosFetch.post(`${IMAGE_SERVER}/upload/${type}`, image);
   },
 };
@@ -75,7 +75,6 @@ export const shiftApi = {
 export const appointmentApi = {
   createAppointment(
     description: string,
-    actualDate: string,
     bookedDate: string,
     priority: string,
     patientUsername: string,
@@ -83,18 +82,18 @@ export const appointmentApi = {
     staffUsername: string
   ) {
     return axiosFetch.post(
-      `${ELGIN_IP}/appointment/createNewAppointmentWithStaff?description=${description}&actualDateTime=${actualDate}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
+      `${ELGIN_IP}/appointment/createNewAppointmentWithStaff?description=${description}&bookedDateTime=${bookedDate}&priority=${priority}&patientUsername=${patientUsername}&departmentName=${department}&staffUsername=${staffUsername}`
     );
   },
   updateAppointment(
     id: number,
     description: string,
-    actualDate: string,
+    bookedDate: string,
     patientUsername: string,
     staffUsername: string
   ) {
     return axiosFetch.put(
-      `${ELGIN_IP}/appointment/updateAppointment?appointmentId=${id}&description=${description}&actualDateTime=${actualDate}&patientUsername=${patientUsername}&staffUsername=${staffUsername}`
+      `${ELGIN_IP}/appointment/updateAppointment?appointmentId=${id}&description=${description}&bookedDateTime=${bookedDate}&patientUsername=${patientUsername}&staffUsername=${staffUsername}`
     );
   },
   deleteAppointment(id: number) {

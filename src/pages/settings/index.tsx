@@ -21,7 +21,6 @@ import {
   IonCardContent,
   IonThumbnail,
 } from "@ionic/react";
-import Navbar from "../navbar/index";
 import { personCircle, logOut, repeat } from "ionicons/icons";
 import { Route, Redirect, useHistory } from "react-router";
 import { patientApi } from "../../api/Api";
@@ -74,15 +73,15 @@ const Settings = () => {
   }, []);
 
   const handleChangePassword = () => {
-    history.push("/settings/change-password");
+    history.push("/tabs/settings/change-password");
   };
 
   const handleLogout = () => {
-    history.push("/");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
     window.dispatchEvent(new Event("storage"));
+    history.push("/");
   };
 
   return (
@@ -108,14 +107,14 @@ const Settings = () => {
             </IonItem>
           </IonCardContent>
         </IonCard>
-        <IonItem>
+        {/* <IonItem>
           <IonIcon
             aria-hidden="true"
             icon={personCircle}
             slot="start"
           ></IonIcon>
           <IonLabel>Profile</IonLabel>
-        </IonItem>
+        </IonItem> */}
         <IonItem onClick={handleChangePassword}>
           <IonIcon aria-hidden="true" icon={repeat} slot="start"></IonIcon>
           <IonLabel>Change password</IonLabel>
@@ -125,7 +124,6 @@ const Settings = () => {
           <IonLabel>Logout</IonLabel>
         </IonItem>
       </IonContent>
-      <Navbar />
     </IonPage>
   );
 };
