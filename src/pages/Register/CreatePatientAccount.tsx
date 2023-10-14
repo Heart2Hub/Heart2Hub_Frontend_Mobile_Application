@@ -17,6 +17,7 @@ import {
   IonText,
   IonImg,
   IonThumbnail,
+  IonToast,
 } from "@ionic/react";
 import { useState, useRef, useEffect } from "react";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
@@ -42,6 +43,8 @@ const CreatePatientAccount: React.FC = () => {
   const [photo, setPhoto] = useState<UserPhoto>();
   const [photoFormData, setPhotoFormData] = useState<FormData | undefined>();
   const [photoError, setPhotoError] = useState("");
+  const [toast, setToast] = useState(false);
+
   const {
     control,
     register,
@@ -105,14 +108,15 @@ const CreatePatientAccount: React.FC = () => {
         });
       }
     } catch (error: any) {
-      setPhotoError(error.response.data);
+      //setPhotoError(error.response.data);
+      setToast(true);
     }
   };
 
   useEffect(() => {
     setPhoto(undefined);
     setPhotoFormData(undefined);
-    setPhotoError("");
+    //setPhotoError("");
     reset();
   }, [isSubmitSuccessful]);
 
@@ -238,7 +242,7 @@ const CreatePatientAccount: React.FC = () => {
           />
 
           <div style={{ marginTop: "16px" }}>
-            {photoError ? <div className="error">{photoError}</div> : null}
+            {/* {photoError ? <div className="error">{photoError}</div> : null} */}
             <IonButton onClick={uploadPhoto}>Choose Image</IonButton>{" "}
           </div>
 
@@ -252,6 +256,13 @@ const CreatePatientAccount: React.FC = () => {
             Create Account
           </IonButton>
         </form>
+        <IonToast
+          isOpen={toast}
+          color="warning"
+          message="Please upload a profile photo"
+          onDidDismiss={() => setToast(false)}
+          duration={3000}
+        ></IonToast>
       </IonContent>
     </IonPage>
   );
