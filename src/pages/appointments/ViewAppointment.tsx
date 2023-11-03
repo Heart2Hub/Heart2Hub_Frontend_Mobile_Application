@@ -82,7 +82,7 @@ const ViewAppointment = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleEdit = () => {
-    history.push(`/tabs/appointments/edit/${id}`, {
+    history.push(`/tabs/services/appointments/edit/${id}`, {
       department: state?.department,
       bookedDateTime: state?.bookedDateTime,
       appointmentId: id,
