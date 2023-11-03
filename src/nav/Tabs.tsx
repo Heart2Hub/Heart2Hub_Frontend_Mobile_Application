@@ -30,6 +30,7 @@ import AddNextOfKin from "../pages/ehr/AddNextOfKin";
 import ChangePassword from "../pages/settings/ChangePassword";
 import Problems from "../pages/ehr/Problems";
 import MedicalHistory from "../pages/ehr/MedicalHistory";
+import Finance from "../pages/finance";
 
 const routes = [
   {
@@ -84,6 +85,10 @@ const routes = [
     path: "/tabs/settings/change-password",
     component: <ChangePassword />,
   },
+  // {
+  //   path: "/tabs/finance",
+  //   component: <Finance />,
+  // },
 ];
 
 const Tabs: React.FC<any> = ({ isAuthenticated }) => (

@@ -155,3 +155,23 @@ export const nextOfKinRecordApi = {
     );
   },
 };
+
+export const invoiceApi = {
+  getAllInvoices() {
+    return axiosFetch.get(`${REST_ENDPOINT}/invoice/getAllInvoices`);
+  },
+  findInvoice(id: number) {
+    return axiosFetch.get(`${REST_ENDPOINT}/invoice/findInvoice/${id}`);
+  },
+  getAllTransactionsOfPatientMobile(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/getAllTransactionsOfPatientMobile/${username}`
+    );
+  },
+  findPatientOfInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findPatientOfInvoice/${id}`
+    );
+  },
+}
+
