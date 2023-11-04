@@ -45,7 +45,9 @@ const SelectDepartment = () => {
 
   const handleDepartmentSelect = (department: string) => {
     setSelectedDepartment(department);
-    history.replace(`/tabs/appointments/select-date-time/${department}`);
+    history.replace(
+      `/tabs/services/appointments/select-date-time/${department}`
+    );
   };
 
   const getAllDepartments = async () => {

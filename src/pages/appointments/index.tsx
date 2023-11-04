@@ -72,7 +72,7 @@ const Appointments = () => {
   );
 
   const handleClick = () => {
-    history.push("/tabs/appointments/select-department");
+    history.push("/tabs/services/appointments/select-department");
   };
 
   const getAllAppointments = async () => {
@@ -152,14 +152,17 @@ const Appointments = () => {
   }
 
   const handleClickAppt = (appointment: Appointment) => {
-    history.push(`/tabs/appointments/view/${appointment?.appointmentId}`, {
-      appointmentId: appointment?.appointmentId,
-      description: appointment?.description,
-      bookedDateTime: appointment?.bookedDateTime,
-      staffDetails: appointment.staffDetails ? appointment.staffDetails : "",
-      department: appointment.departmentName,
-      arrived: appointment.arrived,
-    });
+    history.push(
+      `/tabs/services/appointments/view/${appointment?.appointmentId}`,
+      {
+        appointmentId: appointment?.appointmentId,
+        description: appointment?.description,
+        bookedDateTime: appointment?.bookedDateTime,
+        staffDetails: appointment.staffDetails ? appointment.staffDetails : "",
+        department: appointment.departmentName,
+        arrived: appointment.arrived,
+      }
+    );
   };
 
   function compareByActualDateTime(a: Appointment, b: Appointment): number {

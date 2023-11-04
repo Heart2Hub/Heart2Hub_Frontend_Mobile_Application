@@ -30,6 +30,7 @@ import AddNextOfKin from "../pages/ehr/AddNextOfKin";
 import ChangePassword from "../pages/settings/ChangePassword";
 import Problems from "../pages/ehr/Problems";
 import MedicalHistory from "../pages/ehr/MedicalHistory";
+import Services from "../pages/services";
 import Finance from "../pages/finance";
 
 const routes = [
@@ -38,24 +39,32 @@ const routes = [
     component: <Home />,
   },
   {
-    path: "/tabs/appointments",
+    path: "/tabs/services",
+    component: <Services />,
+  },
+  {
+    path: "/tabs/services/appointments",
     component: <Appointments />,
   },
   {
-    path: "/tabs/appointments/select-department",
+    path: "/tabs/services/appointments/select-department",
     component: <SelectDepartment />,
   },
   {
-    path: "/tabs/appointments/view/:id",
+    path: "/tabs/services/appointments/view/:id",
     component: <ViewAppointment />,
   },
   {
-    path: "/tabs/appointments/select-date-time/:selectedDepartment",
+    path: "/tabs/services/appointments/select-date-time/:selectedDepartment",
     component: <SelectDateTime />,
   },
   {
-    path: "/tabs/appointments/edit/:id",
+    path: "/tabs/services/appointments/edit/:id",
     component: <EditSelectDateTime />,
+  },
+  {
+    path: "/tabs/services/finance",
+    component: <Finance />,
   },
   {
     path: "/tabs/ehr",
@@ -106,10 +115,14 @@ const Tabs: React.FC<any> = ({ isAuthenticated }) => (
         <IonIcon icon={home} />
         <IonLabel>Home</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="appointments" href="/tabs/appointments">
+      <IonTabButton tab="services" href="/tabs/services">
+        <IonIcon icon={grid} />
+        <IonLabel>Services</IonLabel>
+      </IonTabButton>
+      {/* <IonTabButton tab="appointments" href="/tabs/appointments">
         <IonIcon icon={grid} />
         <IonLabel>Appointments</IonLabel>
-      </IonTabButton>
+      </IonTabButton> */}
       <IonTabButton tab="ehr" href="/tabs/ehr">
         <IonIcon icon={document} />
         <IonLabel>EHR</IonLabel>
