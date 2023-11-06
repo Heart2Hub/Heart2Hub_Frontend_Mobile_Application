@@ -23,6 +23,14 @@ export const staffApi = {
   getStaffById(id: number) {
     return axiosFetch.get(`${REST_ENDPOINT}/staff/getStaffById?id=${id}`);
   },
+  getAllStaff() {
+    return axiosFetch.get(`${REST_ENDPOINT}/staff/getAllStaffs`);
+  },
+  getStaffsWorkingInCurrentShiftAndDepartment(unit: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/staff/getStaffsWorkingInCurrentShiftAndDepartment?departmentName=${unit}`
+    );
+  }
 };
 
 export const patientApi = {
@@ -119,6 +127,13 @@ export const appointmentApi = {
   ) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}&selectStaffId=0`
+    );
+  },
+  viewAllAppointmentsByDay(
+    date: string
+  ) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/appointment/viewAllAppointmentsByDay?date=${date}`
     );
   },
 };

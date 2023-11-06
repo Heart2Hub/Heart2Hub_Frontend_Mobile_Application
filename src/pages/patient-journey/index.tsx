@@ -14,7 +14,6 @@ import {
   IonItem,
   IonIcon,
 } from "@ionic/react";
-import Navbar from "../nav/index";
 import { personCircle } from "ionicons/icons";
 import { patientApi } from "../../api/Api";
 
@@ -31,7 +30,6 @@ const Home = () => {
       <IonContent className="ion-padding">
         <IonText color="primary">Patient journey</IonText>
       </IonContent>
-      <Navbar />
     </IonPage>
   );
 };
