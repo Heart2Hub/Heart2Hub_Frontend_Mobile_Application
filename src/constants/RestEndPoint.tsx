@@ -1,4 +1,4 @@
-export const REST_ENDPOINT = "http://localhost:8080";
-export const NEHR_SERVER = "http://localhost:3002";
-export const ELGIN_IP = "http://192.168.1.105:8080";
-export const IMAGE_SERVER = "http://192.168.1.105:3001";
+const IP_CONFIG = "http://localhost"; // Replace localhost with your IP Address
+
+export const REST_ENDPOINT = IP_CONFIG + ":8080";
+export const IMAGE_SERVER = IP_CONFIG + ":3001";
