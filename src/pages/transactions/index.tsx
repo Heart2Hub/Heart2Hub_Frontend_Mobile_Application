@@ -78,15 +78,40 @@ const Transaction: React.FC = () => {
 
 	const sortTransactions = (transactions: Transaction[]) => {
 		if (sortBy === "earliest") {
-			return [...transactions].sort(
-				(a, b) => new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime()
-			);
+			return [...transactions].sort((a, b) => {
+				const dateA = a.transactionDate.split("/");
+				const dateB = b.transactionDate.split("/");
+				const formattedDateA = new Date(
+					parseInt(dateA[2]),
+					parseInt(dateA[1]) - 1, // Months are 0 indexed
+					parseInt(dateA[0])
+				);
+				const formattedDateB = new Date(
+					parseInt(dateB[2]),
+					parseInt(dateB[1]) - 1,
+					parseInt(dateB[0])
+				);
+				return formattedDateA.getTime() - formattedDateB.getTime();
+			});
 		} else {
-			return [...transactions].sort(
-				(a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
-			);
+			return [...transactions].sort((a, b) => {
+				const dateA = a.transactionDate.split("/");
+				const dateB = b.transactionDate.split("/");
+				const formattedDateA = new Date(
+					parseInt(dateA[2]),
+					parseInt(dateA[1]) - 1,
+					parseInt(dateA[0])
+				);
+				const formattedDateB = new Date(
+					parseInt(dateB[2]),
+					parseInt(dateB[1]) - 1,
+					parseInt(dateB[0])
+				);
+				return formattedDateB.getTime() - formattedDateA.getTime();
+			});
 		}
 	};
+
 
 	const filteredAndSortedTransactions = () => {
 		let filtered = transaction;
@@ -107,6 +132,29 @@ const Transaction: React.FC = () => {
 			setPatient(currPatient);
 		} catch (error) {
 			console.log(error);
+		}
+	};
+
+	const fetchInvoicesEarliest = async (username: string) => {
+		try {
+			const response = await transactionApi.getAllTransactionsOfPatientMobile(username);
+			console.log(response.data)
+			const formattedTransactions = response.data.map((transaction: Transaction) => {
+				const dateArray = transaction.transactionDate;
+				const year = dateArray[0];
+				const month = dateArray[1];
+				const day = dateArray[2];
+
+				// Format the date in the desired format
+				const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+				return {
+					...transaction,
+					transactionDate: formattedDate,
+				};
+			});
+			setTransactions(formattedTransactions);
+		} catch (error) {
+			console.error("Error fetching invoices: ", error);
 		}
 	};
 
@@ -194,7 +242,7 @@ const Transaction: React.FC = () => {
 						>
 							<IonLabel>
 								<h2>Transaction ID: {item.transactionId}</h2>
-								<p>Amount: ${item.transactionAmount}</p>
+								<p>Amount: ${item.transactionAmount.toFixed(2)}</p>
 								<p>Transaction Date: {item.transactionDate}</p>
 								<p>
 									Status:

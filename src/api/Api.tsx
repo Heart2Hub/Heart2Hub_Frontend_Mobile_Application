@@ -168,6 +168,11 @@ export const invoiceApi = {
       `${REST_ENDPOINT}/invoice/findInvoicesOfAPatient/${username}`
     );
   },
+  findInvoicesOfAPatientEarliest(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findInvoicesOfAPatientEarliest/${username}`
+    );
+  },
   findPatientOfInvoice(id: number) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/invoice/findPatientOfInvoice/${id}`
@@ -193,6 +198,9 @@ export const invoiceApi = {
   export const transactionApi = {
     getAllTransactionsOfPatientMobile(username: string) {
       return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobile/${username}`);
+    },
+    getAllTransactionsOfPatientMobileEarliest(username: string) {
+      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobileEarliest/${username}`);
     },
     createTransaction(id: number, amount: number) {
       return axiosFetch.post(`${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`);

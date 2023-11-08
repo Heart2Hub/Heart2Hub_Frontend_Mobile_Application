@@ -234,7 +234,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 						Invoice ID: {state?.invoiceId}
 					</IonCardHeader>
 					<IonCardContent>
-						<p>Amount: ${state?.invoiceAmount}</p>
+						<p>Amount: ${state?.invoiceAmount.toFixed(2)}</p>
 						<p>Due Date: {state?.invoiceDueDate}</p>
 						<IonChip color={getStatusColor(state?.invoiceStatusEnum)}>
 							<IonLabel>Status: {state?.invoiceStatusEnum}</IonLabel>
@@ -253,7 +253,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 														<IonLabel>
 															<h2>{item.transactionItemName}</h2>
 															<p>
-																Quantity: {item.transactionItemQuantity} | Total Price: ${item.transactionItemPrice}
+																Quantity: {item.transactionItemQuantity} | Total Price: ${item.transactionItemPrice.toFixed(2)}
 															</p>
 														</IonLabel>
 													</IonItem>
@@ -272,7 +272,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 														<IonLabel>
 															<h2>{item.transactionItemName}</h2>
 															<p>
-																${item.transactionItemPrice}
+																${item.transactionItemPrice.toFixed(2)}
 															</p>
 														</IonLabel>
 													</IonItem>
@@ -285,7 +285,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 										<IonText>
 											<h3>
 												<strong>Total Amount Payable:</strong> $
-												{transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0)}
+												{transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0).toFixed(2)}
 											</h3>
 										</IonText>
 									</IonCol>
@@ -329,7 +329,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 										<IonItem>
 											<IonLabel>
 												<h3>Transaction Amount:</h3>
-												<p>${transactionDetails.transactionAmount}</p>
+												<p>${transactionDetails.transactionAmount.toFixed(2)}</p>
 											</IonLabel>
 										</IonItem>
 									)}

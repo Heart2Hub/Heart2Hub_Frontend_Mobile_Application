@@ -94,15 +94,40 @@ const Finance: React.FC = () => {
 
   const sortInvoices = (invoicesToSort: Invoice[]) => {
     if (sortBy === "earliest") {
-      return [...invoicesToSort].sort(
-        (a, b) => new Date(a.invoiceDueDate).getTime() - new Date(b.invoiceDueDate).getTime()
-      );
+      return [...invoicesToSort].sort((a, b) => {
+        const dateA = a.invoiceDueDate.split("/");
+        const dateB = b.invoiceDueDate.split("/");
+        const formattedDateA = new Date(
+          parseInt(dateA[2]),
+          parseInt(dateA[1]) - 1, // Months are 0 indexed
+          parseInt(dateA[0])
+        );
+        const formattedDateB = new Date(
+          parseInt(dateB[2]),
+          parseInt(dateB[1]) - 1,
+          parseInt(dateB[0])
+        );
+        return formattedDateA.getTime() - formattedDateB.getTime();
+      });
     } else {
-      return [...invoicesToSort].sort(
-        (a, b) => new Date(b.invoiceDueDate).getTime() - new Date(a.invoiceDueDate).getTime()
-      );
+      return [...invoicesToSort].sort((a, b) => {
+        const dateA = a.invoiceDueDate.split("/");
+        const dateB = b.invoiceDueDate.split("/");
+        const formattedDateA = new Date(
+          parseInt(dateA[2]),
+          parseInt(dateA[1]) - 1,
+          parseInt(dateA[0])
+        );
+        const formattedDateB = new Date(
+          parseInt(dateB[2]),
+          parseInt(dateB[1]) - 1,
+          parseInt(dateB[0])
+        );
+        return formattedDateB.getTime() - formattedDateA.getTime();
+      });
     }
   };
+
 
   const filteredAndSortedInvoices = () => {
     let filtered = statusFilter ? invoices.filter((invoice) => invoice.invoiceStatusEnum === statusFilter) : invoices;
@@ -225,7 +250,7 @@ const Finance: React.FC = () => {
             >
               <IonLabel>
                 <h2>Invoice ID: {invoice.invoiceId}</h2>
-                <p>Amount: ${invoice.invoiceAmount}</p>
+                <p>Amount: ${invoice.invoiceAmount.toFixed(2)}</p>
                 <p>Due Date: {invoice.invoiceDueDate}</p>
                 <IonChip color={getStatusColor(invoice.invoiceStatusEnum)}>
                   <IonLabel>Status: {invoice.invoiceStatusEnum}</IonLabel>
