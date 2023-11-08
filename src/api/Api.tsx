@@ -30,7 +30,12 @@ export const staffApi = {
     return axiosFetch.get(
       `${REST_ENDPOINT}/staff/getStaffsWorkingInCurrentShiftAndDepartment?departmentName=${unit}`
     );
-  }
+  },
+  getStaffsInUnit(unit: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/staff/getStaffsInUnit?&unit=${unit}`
+    );
+  },
 };
 
 export const patientApi = {
@@ -134,6 +139,11 @@ export const appointmentApi = {
   ) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/appointment/viewAllAppointmentsByDay?date=${date}`
+    );
+  },
+  update() {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/appointment/update`
     );
   },
 };

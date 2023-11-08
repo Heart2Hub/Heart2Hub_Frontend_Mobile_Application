@@ -7,14 +7,10 @@ import {
   IonToolbar,
   IonInput,
   IonImg,
-  IonButton,
-  IonFooter,
-  IonText,
+  IonAccordion, IonAccordionGroup, IonItem,
+  IonBadge,
   IonLabel,
-  IonItem,
-  IonIcon,
-  IonButtons,
-  IonThumbnail,
+  AccordionGroupCustomEvent,
 } from "@ionic/react";
 import { patientApi, appointmentApi, staffApi } from "../../api/Api";
 import { personCircle, logOut, repeat, arrowForward } from "ionicons/icons";
@@ -54,6 +50,7 @@ interface Appointment {
   arrived: boolean;
   swimlaneStatusEnum: string;
   listOfStaffsId: number[];
+  dispensaryStatusEnum: string;
 }
 
 //TODO: create a 'models' folder with our diff entities
@@ -72,8 +69,8 @@ const Home = () => {
   const getAppointmentToday = async () => {
     try {
       const response = await appointmentApi.viewAllAppointmentsByDay(date.format('YYYY-MM-DD') + "T00:00:00");
-      const appts = response.data.filter((appointment: any) => appointment.nric === patient?.nric);
-      getAllStaff(appts[0].departmentName)
+      const appts = response.data.filter((appointment: any) => appointment.username === storedUsername);
+      getAllStaff(appts[0]?.departmentName)
       setCurrAppointments(appts);
     } catch (error) {
       console.log(error);
@@ -98,32 +95,49 @@ const Home = () => {
     }
   }
 
-  const getStaff = (id: number) => {
-    for (let i=0; i<staffs.length; i++) {
-      if (staffs[i].staffId === id) {
-        return staffs[i].firstname + " " + staffs[i].lastname;
+  const getStaff = (staffsId: number[], swimlane: string) => {
+    for (let i=0; i<staffsId.length; i++) {
+      for (let j=0; j<staffs.length; j++) {
+        if (swimlane === "REGISTRATION") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum === "ADMIN") {
+            return staffs[j];
+          }
+        } else if (swimlane === "TRIAGE") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum === "NURSE") {
+            return staffs[j];
+          }
+        } else if (swimlane === "CONSULTATION") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum === "DOCTOR") {
+            return staffs[j];
+          }
+        } else if (swimlane === "PHARMACY") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum === "PHARMACIST") {
+            return staffs[j];
+          }
+        } else if (swimlane === "ADMISSION") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum === "ADMIN") {
+            return staffs[j];
+          }
+        } else if (swimlane === "TREATMENT") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum !== "ADMIN" && 
+          staffs[j].staffRoleEnum !== "DOCTOR" && staffs[j].staffRoleEnum !== "NURSE" && staffs[j].staffRoleEnum !== "PHARMACIST") {
+            return staffs[j];
+          }
+        } else if (swimlane === "DISCHARGE") {
+          if (staffs[j].staffId === staffsId[i] && staffs[j].staffRoleEnum === "ADMIN") { 
+            return staffs[j];
+          }
+        }
       }
     }
-    return "NA"
+    for (let j=0; j<staffs.length; j++) {
+      if (staffs[j].staffId === 1) {
+        return staffs[j];
+      }
+    }
+    return staffs[0];
   }
 
-  const getStaffLocation = (id: number) => {
-    for (let i=0; i<staffs.length; i++) {
-      if (staffs[i].staffId === id) {
-        return staffs[i].location + ", " + staffs[i].name
-      }
-    }
-    return "NA"
-  }
-
-  const getStaffRole = (id: number) => {
-    for (let i=0; i<staffs.length; i++) {
-      if (staffs[i].staffId === id) {
-        return staffs[i].staffRoleEnum;
-      }
-    }
-    return "NA"
-  }
 
   const getDateTime = (arr: number[]) => {
     const year = arr[0];
@@ -135,30 +149,77 @@ const Home = () => {
     return day + "/" + month + "/" + year + " " + time + ":00" + m;
   }
 
+  const getNumberOfRoles = (listOfStaffsId: number[]) => {
+    let list: string[] = [];
+    for (let i=0; i<listOfStaffsId.length; i++) {
+      for (let j=0; j<staffs.length; j++) {
+        if (listOfStaffsId[i] === staffs[j].staffId) {
+          if (!list.includes(staffs[j].staffRoleEnum)) {
+            list.push(staffs[j].staffRoleEnum)
+          }
+        }
+      }
+    }
+    return list;
+  }
+
   const getAllStaff = async (unit: string) => {
     try {
+      let allStaffs = [];
       const response = await staffApi.getStaffsWorkingInCurrentShiftAndDepartment(unit);
-      setStaffs(response.data);
+      const pharmacists = await staffApi.getStaffsInUnit('Pharmacy');
+      allStaffs = response.data.concat(pharmacists.data);
+      setStaffs(allStaffs);
     } catch(error) {
       console.log(error);
     }
   }
 
-  const showTimelineCard = (appointment: any, swimlane: string, index: number, arrived: string) => {
+  const showTimelineCard = (appointment: any, swimlane: string, arrived: string, here: boolean) => {
     return (
       <VerticalTimelineElement
         className="vertical-timeline-element--work"
         contentStyle={{ background: getColor(swimlane), color: '#fff' }}
         contentArrowStyle={{ borderRight: `7px solid  ${getColor(swimlane)}` }}
-        date={`Staff: ${getStaffRole(appointment.listOfStaffsId[appointment.listOfStaffsId?.length-index])} ` + getStaff(appointment.listOfStaffsId[appointment.listOfStaffsId?.length-index])}
+        date={
+        ((swimlane === "PHARMACY" && getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum !== "PHARMACIST") ||
+          (swimlane === "REGISTRATION" && getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum !== "ADMIN") ||
+          (swimlane === "DISCHARGE" && getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum !== "ADMIN"))
+        ?
+        "Staff: Unassigned" :
+        `Staff: ${getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum} ` 
+        + 
+        getStaff(appointment.listOfStaffsId, swimlane)?.firstname + " " + getStaff(appointment.listOfStaffsId, swimlane)?.lastname}
         iconStyle={{ background: getColor(swimlane), color: '#fff' }}
       >
-        <h3 className="vertical-timeline-element-title"><b>{swimlane}</b></h3>
+        <h3 className="vertical-timeline-element-title" style={{ display: "flex", justifyContent: "space-between"}}>
+          <b>{swimlane}</b>
+          {here && <IonBadge style={{ paddingTop: 8, fontSize: '11px', backgroundColor: 'yellow', color: 'black'}}>
+            <span 
+              style={{ height: "8px", 
+              width: "8px", 
+              backgroundColor: 'red', 
+              borderRadius: "50%", 
+              display: "inline-block"}}></span>&nbsp;
+            YOU ARE HERE
+          </IonBadge>}
+        </h3>
         <h5 className="vertical-timeline-element-subtitle">{appointment.departmentName}</h5>
         <p style={{ fontSize: "15px"}}>
           {swimlane === "REGISTRATION" && <><b>Date/Time:</b> {getDateTime(appointment.bookedDateTime)}<br/></>}
-          <b>Location:</b> {getStaffLocation(appointment.listOfStaffsId[appointment.listOfStaffsId?.length-index])}<br/>
-          <b>Arrived:</b> {arrived}
+          <b>Location:</b> {swimlane !== "PHARMACY" ? 
+          getStaff(appointment.listOfStaffsId, swimlane)?.location + " " + getStaff(appointment.listOfStaffsId, swimlane)?.name : "Level 1 Entrance"}<br/>
+          <b>Arrived:</b> <IonBadge
+            style={{ paddingTop: 3, paddingBottom: 5, marginBottom: -7, 
+              color: arrived === "Yes" ? "green" : "red",
+              backgroundColor: 'rgb(255,255,255,1)' }}>{arrived}</IonBadge><br/>
+          {swimlane === "PHARMACY" && 
+            <>
+            <b>Medicine status:</b> <IonBadge
+              style={{ paddingTop: 3, paddingBottom: 5, marginBottom: -7, 
+              backgroundColor: appointment.dispensaryStatusEnum === "PREPARING" ? "orange" : 
+              appointment.dispensaryStatusEnum === "READY_TO_COLLECT" ? "green" : "grey",
+              color: 'rgb(255,255,255)' }}>{appointment.dispensaryStatusEnum}</IonBadge></>}
         </p>
         
       </VerticalTimelineElement>
@@ -173,6 +234,15 @@ const Home = () => {
       }
     }, []
   )
+
+  // const accordionGroupChange = (ev: AccordionGroupCustomEvent) => {
+  //   const collapsedItems = values.filter((value) => value !== ev.detail.value);
+  //   const selectedValue = ev.detail.value;
+
+  //   console.log(
+  //     `Expanded: ${selectedValue === undefined ? 'None' : ev.detail.value} | Collapsed: ${collapsedItems.join(', ')}`
+  //   );
+  // };
   
 
   useEffect(() => {
@@ -228,41 +298,49 @@ const Home = () => {
         {currAppointments?.length > 0 ? 
         <>
           <p>You have {currAppointments.length} {currAppointments.length === 1 ? " appointment " : " appointments "} today:</p>
-          {currAppointments.map(appointment => 
+          <IonAccordionGroup expand="inset">
+          {currAppointments.map((appointment, index) => 
+          <IonAccordion value={appointment.appointmentId.toString()}>
+             <IonItem slot="header" color="light">
+              <IonLabel>Appointment {index+1}</IonLabel>
+            </IonItem>
+            <div slot="content">
           <VerticalTimeline lineColor={getColor(appointment.swimlaneStatusEnum)}>
             {appointment.swimlaneStatusEnum === "CONSULTATION" ?
 
             // Triage -> Consultation
             <>
-              {showTimelineCard(appointment, "REGISTRATION", 1, "Yes")}
-              {showTimelineCard(appointment, "TRIAGE", 2, "Yes")}
-              {showTimelineCard(appointment, "CONSULTATION", appointment.listOfStaffsId.length, appointment.listOfStaffsId.length > 3 || appointment.arrived ? "Yes" : "No")}
+              {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+              {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+              {showTimelineCard(appointment, "CONSULTATION", 
+              appointment.listOfStaffsId.length > 3 || appointment.arrived ? "Yes" : "No", 
+              appointment.listOfStaffsId.length === 3 ? true : false)}
 
               {/* Consultation -> Treatment -> Consultation */}
               {appointment.listOfStaffsId.length > 3 ? 
               <>
-              {showTimelineCard(appointment, "TREATMENT", 4, "Yes")}
-              {showTimelineCard(appointment, "CONSULTATION", 3, appointment.arrived ? "Yes" : "No")}
+              {showTimelineCard(appointment, "TREATMENT", "Yes", false)}
+              {showTimelineCard(appointment, "CONSULTATION", appointment.arrived ? "Yes" : "No", true)}
               </> : null}
             </> : 
             
             appointment.swimlaneStatusEnum === "TRIAGE" ?
             <>
-              {showTimelineCard(appointment, "REGISTRATION", 1, "Yes")}
-              {showTimelineCard(appointment, "TRIAGE", 2, appointment.arrived ? "Yes" : "No")}
+              {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+              {showTimelineCard(appointment, "TRIAGE", appointment.arrived ? "Yes" : "No", true)}
             </> : 
             
             appointment.swimlaneStatusEnum === "REGISTRATION" ?
             <>
-              {showTimelineCard(appointment, "REGISTRATION", 1, appointment.arrived ? "Yes" : "No")}
+              {showTimelineCard(appointment, "REGISTRATION", appointment.arrived ? "Yes" : "No", true)}
             </> :
             
             appointment.swimlaneStatusEnum === "TREATMENT" ?
             <>
-              {showTimelineCard(appointment, "REGISTRATION", 1, "Yes")}
-              {showTimelineCard(appointment, "TRIAGE", 2, "Yes")}
-              {showTimelineCard(appointment, "CONSULTATION", 3, "Yes")}
-              {showTimelineCard(appointment, "TREATMENT", 4, appointment.arrived ? "Yes" : "No")}
+              {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+              {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+              {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+              {showTimelineCard(appointment, "TREATMENT", appointment.arrived ? "Yes" : "No", true)}
             </> : 
             
             appointment.swimlaneStatusEnum === "PHARMACY" ?
@@ -270,14 +348,71 @@ const Home = () => {
                 {/* // Consultation -> Pharmacy */}
                 {appointment.listOfStaffsId.length === 3 ?
                 <>
-                
+                  {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                  {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                  {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                  {showTimelineCard(appointment, "PHARMACY", appointment.arrived ? "Yes" : "No", true)}
                 </> :
                 // Consultation -> Treatment -> Consultation -> Pharmacy
-                appointment.listOfStaffsId.length === 4 ?
+                appointment.listOfStaffsId.length >= 4 ?
                 <>
-                </> : <></>}
-              </> : null}
-          </VerticalTimeline>)}
+                  {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                  {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                  {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                  {showTimelineCard(appointment, "TREATMENT", "Yes", false)}
+                  {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                  {showTimelineCard(appointment, "PHARMACY", appointment.arrived ? "Yes" : "No", true)}
+                </> : 
+                
+                 // From Pharmacy directly
+                <>
+                  {showTimelineCard(appointment, "PHARMACY", appointment.arrived ? "Yes" : "No", true)}
+                </>}
+              </> :
+            appointment.swimlaneStatusEnum === "DISCHARGE" || appointment.swimlaneStatusEnum === "DONE" ?
+            <>
+              {/* Consultation -> Discharge */}
+              {getNumberOfRoles(appointment.listOfStaffsId).length === 3 ? 
+              <>
+                {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+              </> : 
+              
+              // Consultation -> Pharmacy -> Discharge
+              getNumberOfRoles(appointment.listOfStaffsId).includes("PHARMACIST") && getNumberOfRoles(appointment.listOfStaffsId).length === 4?
+              <>
+                {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "PHARMACY", "Yes", false)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+              </> : 
+
+              // Consultation -> Treatment -> Consultation -> Pharmacy -> Discharge
+              getNumberOfRoles(appointment.listOfStaffsId).includes("PHARMACIST") && getNumberOfRoles(appointment.listOfStaffsId).length > 4?
+              <>
+                {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "TREATMENT", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "PHARMACY", "Yes", false)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+              </> : 
+
+              // Pharmacy -> Discharge
+              <>
+                {showTimelineCard(appointment, "PHARMACY", "Yes", false)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+              </>}
+            </>
+              : null}
+          </VerticalTimeline>
+          </div>
+          </IonAccordion>)}
+          </IonAccordionGroup>
         </>:
         <p>You have nothing on today &#x1F604;</p>}
       </IonContent>
