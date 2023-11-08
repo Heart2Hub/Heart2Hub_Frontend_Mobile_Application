@@ -19,6 +19,7 @@ import heartLogo from "../../assets/heartLogo.png";
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import dayjs from "dayjs";
+import { REST_ENDPOINT } from "../../constants/RestEndPoint";
 
 type Patient = {
   patientId: number,
@@ -192,19 +193,19 @@ const Home = () => {
         getStaff(appointment.listOfStaffsId, swimlane)?.firstname + " " + getStaff(appointment.listOfStaffsId, swimlane)?.lastname}
         iconStyle={{ background: getColor(swimlane), color: '#fff' }}
       >
-        <h3 className="vertical-timeline-element-title" style={{ display: "flex", justifyContent: "space-between"}}>
+        <h4 className="vertical-timeline-element-title" style={{ display: "flex", justifyContent: "space-between"}}>
           <b>{swimlane}</b>
-          {here && <IonBadge style={{ paddingTop: 8, fontSize: '11px', backgroundColor: 'yellow', color: 'black'}}>
+          {here && <IonBadge style={{ paddingTop: 8, fontSize: '9px', backgroundColor: 'yellow', color: 'black'}}>
             <span 
-              style={{ height: "8px", 
-              width: "8px", 
+              style={{ height: "6px", 
+              width: "6px", 
               backgroundColor: 'red', 
               borderRadius: "50%", 
               display: "inline-block"}}></span>&nbsp;
             YOU ARE HERE
           </IonBadge>}
-        </h3>
-        <h5 className="vertical-timeline-element-subtitle">{appointment.departmentName}</h5>
+        </h4>
+        <h6 className="vertical-timeline-element-subtitle">{appointment.departmentName}</h6>
         <p style={{ fontSize: "15px"}}>
           {swimlane === "REGISTRATION" && <><b>Date/Time:</b> {getDateTime(appointment.bookedDateTime)}<br/></>}
           <b>Location:</b> {swimlane !== "PHARMACY" ? 
@@ -235,14 +236,69 @@ const Home = () => {
     }, []
   )
 
-  // const accordionGroupChange = (ev: AccordionGroupCustomEvent) => {
-  //   const collapsedItems = values.filter((value) => value !== ev.detail.value);
-  //   const selectedValue = ev.detail.value;
+  function isFunction(functionToCheck: any) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+  }
+  
+  function debounce(func: any, wait: any) {
+      var timeout: any
+      var waitFunc;
+      
+      return () => {
+          if (isFunction(wait)) {
+              waitFunc = wait;
+          }
+          else {
+              waitFunc = function() { return wait };
+          }
+          
+          var context = this, args = arguments;
+          var later = function() {
+              timeout = null;
+              func.apply(context, args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, waitFunc());
+      };
+  }
+  
+  // reconnectFrequencySeconds doubles every retry
+  var reconnectFrequencySeconds = 1;
+  var eventSource: EventSource
+  
+  var reconnectFunc = debounce(function() {
+      setupSSEListener();
+      // Double every attempt to avoid overwhelming server
+      reconnectFrequencySeconds *= 2;
+      // Max out at ~1 minute as a compromise between user experience and server load
+      if (reconnectFrequencySeconds >= 64) {
+          reconnectFrequencySeconds = 64;
+      }
+  }, function() { return reconnectFrequencySeconds * 1000 });
 
-  //   console.log(
-  //     `Expanded: ${selectedValue === undefined ? 'None' : ev.detail.value} | Collapsed: ${collapsedItems.join(', ')}`
-  //   );
-  // };
+  const setupSSEListener = () => {
+    eventSource = new EventSource(`${REST_ENDPOINT}/appointment/sse`);
+
+    eventSource.onmessage = (event) => {
+      // Handle the SSE update from the server
+      if (event.data === 'arrive' || event.data === 'swimlane' 
+      || event.data === 'dispensary' || event.data === 'assign') {
+        getAppointmentToday();
+      }
+    };
+
+    eventSource.onopen = function(e) {
+      // Reset reconnect frequency upon successful connection
+      reconnectFrequencySeconds = 1;
+    };
+
+    eventSource.onerror = (error) => {
+      // Handle errors, e.g., connection lost
+      console.error('SSE Error:', error);
+      eventSource.close();
+      reconnectFunc();
+    };
+  };
   
 
   useEffect(() => {
@@ -258,13 +314,16 @@ const Home = () => {
         console.log(error);
       }
     };
-    if (!patient) getPatientDetails()
+    if (!patient) {
+      getPatientDetails();
+    }
     else {
-      getAppointmentToday();
-      const interval = setInterval(() => {
-        getApptData()
-      }, 5000);
-      return () => clearInterval(interval)
+      getAppointmentToday()
+      setupSSEListener();
+      // const interval = setInterval(() => {
+      //   getApptData()
+      // }, 10000);
+      // return () => clearInterval(interval)
     }
   }, [patient, getApptData]);
 
