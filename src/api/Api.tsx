@@ -210,4 +210,10 @@ export const invoiceApi = {
     },
   }
 
+  export const subsidyApi = {
+    findAllSubsidiesOfPatient(username: string) {
+      return axiosFetch.get(`${REST_ENDPOINT}/subsidy/findAllSubsidiesOfPatient/${username}`);
+    },
+  }
+
 

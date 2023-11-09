@@ -34,6 +34,7 @@ import Services from "../pages/services";
 import Finance from "../pages/finance";
 import InvoiceDetails from "../pages/finance/InvoiceDetails";
 import Transaction from "../pages/transactions";
+import Subsidies from "../pages/ehr/Subsidy";
 
 const routes = [
   {
@@ -104,6 +105,10 @@ const routes = [
     path: "/tabs/services/transaction",
     component: <Transaction />,
   },
+  {
+    path: "/tabs/ehr/subsidies",
+    component: <Subsidies />,
+  },
 ];
 
 const Tabs: React.FC<any> = ({ isAuthenticated }) => (
@@ -123,6 +128,7 @@ const Tabs: React.FC<any> = ({ isAuthenticated }) => (
       <Route exact path="/tabs/services/transaction" component={Transaction} />
       <Route exact path="/tabs/services/finance/invoice/:id" component={InvoiceDetails} />
       <Route exact path="/tabs/ehr" component={EHR} />
+      <Route exact path="/tabs/ehr/subsidies" component={Subsidies} />
       <Route exact path="/tabs/ehr/general-information" component={GeneralInformation} />
       <Route exact path="/tabs/ehr/next-of-kin" component={AddNextOfKin} />
       <Route exact path="/tabs/ehr/problems" component={Problems} />
