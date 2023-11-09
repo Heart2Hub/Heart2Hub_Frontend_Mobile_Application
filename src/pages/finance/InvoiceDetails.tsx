@@ -253,7 +253,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 														<IonLabel>
 															<h2>{item.transactionItemName}</h2>
 															<p>
-																Quantity: {item.transactionItemQuantity} | Total Price: ${item.transactionItemPrice.toFixed(2)}
+																Quantity: {item.transactionItemQuantity} | Total Price: ${item.transactionItemPrice.toFixed(2) * item.transactionItemQuantity}
 															</p>
 														</IonLabel>
 													</IonItem>
@@ -285,7 +285,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 										<IonText>
 											<h3>
 												<strong>Total Amount Payable:</strong> $
-												{transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0).toFixed(2)}
+												{transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0).toFixed(2)}
 											</h3>
 										</IonText>
 									</IonCol>
