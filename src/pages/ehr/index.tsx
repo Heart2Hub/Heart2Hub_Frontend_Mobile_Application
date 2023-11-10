@@ -108,6 +108,15 @@ const EHR: React.FC = () => {
               </IonItem>
             </IonCardContent>
           </IonCard>
+          <div style={{ height: "5px" }}></div>
+          <IonCard onClick={() => history.push("/tabs/ehr/subsidies")}>
+            <IonCardContent>
+              <IonItem lines="none" style={{ fontSize: "18px" }}>
+                <IonLabel>Subsidies</IonLabel>
+                <IonIcon icon={arrowForward} slot="end"></IonIcon>
+              </IonItem>
+            </IonCardContent>
+          </IonCard>
         </IonList>
       </IonContent>
     </IonPage>

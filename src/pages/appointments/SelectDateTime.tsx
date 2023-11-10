@@ -73,7 +73,7 @@ interface Appointment {
   bookedDateTime: string[];
   currentAssignedStaffId: number;
   staffDetails?: Staff;
-  listOfStaffsId: number[]
+  listOfStaffsId: number[];
 }
 
 interface TimeSlotMap {
@@ -472,7 +472,7 @@ const SelectDateTime = () => {
                   }
                 } catch (error: any) {
                   data.reason = "";
-                    setError(error.response.data);
+                  setError(error.response.data);
                 }
 
                 setShowConfirmationAlert(false);
@@ -499,7 +499,7 @@ const SelectDateTime = () => {
             {
               text: "Ok",
               handler: () => {
-                history.push("/tabs/appointments", { message: "" });
+                history.push("/tabs/services/appointments", { message: "" });
                 setConfirm(false);
                 setSelectedDate(dayjs().toISOString());
               },

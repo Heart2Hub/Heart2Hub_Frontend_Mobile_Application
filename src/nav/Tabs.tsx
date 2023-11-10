@@ -30,6 +30,11 @@ import AddNextOfKin from "../pages/ehr/AddNextOfKin";
 import ChangePassword from "../pages/settings/ChangePassword";
 import Problems from "../pages/ehr/Problems";
 import MedicalHistory from "../pages/ehr/MedicalHistory";
+import Services from "../pages/services";
+import Finance from "../pages/finance";
+import InvoiceDetails from "../pages/finance/InvoiceDetails";
+import Transaction from "../pages/transactions";
+import Subsidies from "../pages/ehr/Subsidy";
 
 const routes = [
   {
@@ -37,24 +42,32 @@ const routes = [
     component: <Home />,
   },
   {
-    path: "/tabs/appointments",
+    path: "/tabs/services",
+    component: <Services />,
+  },
+  {
+    path: "/tabs/services/appointments",
     component: <Appointments />,
   },
   {
-    path: "/tabs/appointments/select-department",
+    path: "/tabs/services/appointments/select-department",
     component: <SelectDepartment />,
   },
   {
-    path: "/tabs/appointments/view/:id",
+    path: "/tabs/services/appointments/view/:id",
     component: <ViewAppointment />,
   },
   {
-    path: "/tabs/appointments/select-date-time/:selectedDepartment",
+    path: "/tabs/services/appointments/select-date-time/:selectedDepartment",
     component: <SelectDateTime />,
   },
   {
-    path: "/tabs/appointments/edit/:id",
+    path: "/tabs/services/appointments/edit/:id",
     component: <EditSelectDateTime />,
+  },
+  {
+    path: "/tabs/services/finance",
+    component: <Finance />,
   },
   {
     path: "/tabs/ehr",
@@ -84,26 +97,53 @@ const routes = [
     path: "/tabs/settings/change-password",
     component: <ChangePassword />,
   },
+  {
+    path: "/tabs/services/finance",
+    component: <Finance />,
+  },
+  {
+    path: "/tabs/services/transaction",
+    component: <Transaction />,
+  },
+  {
+    path: "/tabs/ehr/subsidies",
+    component: <Subsidies />,
+  },
 ];
 
 const Tabs: React.FC<any> = ({ isAuthenticated }) => (
   <IonTabs>
     <IonRouterOutlet>
-      <Redirect exact path="/tabs" to="/tabs/home" />
-      {routes.map((route) => (
-        <Route exact path={route.path} key={route.path}>
-          {isAuthenticated ? route.component : <Redirect to="/" />}
-        </Route>
-      ))}
+      <Route exact path="/tabs">
+        <Redirect to="/tabs/home" />
+      </Route>
+      <Route exact path="/tabs/home" component={Home} />
+      <Route exact path="/tabs/services" component={Services} />
+      <Route exact path="/tabs/services/appointments" component={Appointments} />
+      <Route exact path="/tabs/services/appointments/select-department" component={SelectDepartment} />
+      <Route exact path="/tabs/services/appointments/view/:id" component={ViewAppointment} />
+      <Route exact path="/tabs/services/appointments/select-date-time/:selectedDepartment" component={SelectDateTime} />
+      <Route exact path="/tabs/services/appointments/edit/:id" component={EditSelectDateTime} />
+      <Route exact path="/tabs/services/finance" component={Finance} />
+      <Route exact path="/tabs/services/transaction" component={Transaction} />
+      <Route exact path="/tabs/services/finance/invoice/:id" component={InvoiceDetails} />
+      <Route exact path="/tabs/ehr" component={EHR} />
+      <Route exact path="/tabs/ehr/subsidies" component={Subsidies} />
+      <Route exact path="/tabs/ehr/general-information" component={GeneralInformation} />
+      <Route exact path="/tabs/ehr/next-of-kin" component={AddNextOfKin} />
+      <Route exact path="/tabs/ehr/problems" component={Problems} />
+      <Route exact path="/tabs/ehr/medical-history" component={MedicalHistory} />
+      <Route exact path="/tabs/settings" component={Settings} />
+      <Route exact path="/tabs/settings/change-password" component={ChangePassword} />
     </IonRouterOutlet>
     <IonTabBar slot="bottom">
       <IonTabButton tab="home" href="/tabs/home">
         <IonIcon icon={home} />
         <IonLabel>Home</IonLabel>
       </IonTabButton>
-      <IonTabButton tab="appointments" href="/tabs/appointments">
+      <IonTabButton tab="services" href="/tabs/services">
         <IonIcon icon={grid} />
-        <IonLabel>Appointments</IonLabel>
+        <IonLabel>Services</IonLabel>
       </IonTabButton>
       <IonTabButton tab="ehr" href="/tabs/ehr">
         <IonIcon icon={document} />

@@ -180,3 +180,65 @@ export const nextOfKinRecordApi = {
     );
   },
 };
+
+export const invoiceApi = {
+  getAllInvoices() {
+    return axiosFetch.get(`${REST_ENDPOINT}/invoice/getAllInvoices`);
+  },
+  findInvoice(id: number) {
+    return axiosFetch.get(`${REST_ENDPOINT}/invoice/findInvoice/${id}`);
+  },
+  findInvoicesOfAPatient(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findInvoicesOfAPatient/${username}`
+    );
+  },
+  findInvoicesOfAPatientEarliest(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findInvoicesOfAPatientEarliest/${username}`
+    );
+  },
+  findPatientOfInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findPatientOfInvoice/${id}`
+    );
+  },
+  findMedishieldClaimOfInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findMedishieldClaimOfInvoice/${id}`
+    );
+  },
+  findInsuranceClaimOfInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findInsuranceClaimOfInvoice/${id}`
+    );
+  },
+  findTransactionItemOfInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findTransactionItemOfInvoice/${id}`
+    );
+  },
+}
+
+  export const transactionApi = {
+    getAllTransactionsOfPatientMobile(username: string) {
+      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobile/${username}`);
+    },
+    getAllTransactionsOfPatientMobileEarliest(username: string) {
+      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobileEarliest/${username}`);
+    },
+    createTransaction(id: number, amount: number) {
+      return axiosFetch.post(`${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`);
+    },
+    findTransactionWithInvoice(id: number) {
+      return axiosFetch.get(`${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`);
+    },
+  }
+
+  export const subsidyApi = {
+    findAllSubsidiesOfPatient(username: string) {
+      return axiosFetch.get(`${REST_ENDPOINT}/subsidy/findAllSubsidiesOfPatient/${username}`);
+    },
+  }
+
+
