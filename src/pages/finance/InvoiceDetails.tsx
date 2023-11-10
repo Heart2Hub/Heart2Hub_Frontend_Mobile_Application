@@ -196,7 +196,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 		console.log(token);
 		console.log(transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0))
 		try {
-			const total = transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0)
+			const total = transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0)
 			const response = await transactionApi.createTransaction(Number(id), total);
 			console.log(response.data)
 			history.push('/tabs/services/finance');
@@ -207,7 +207,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 					headers: {
 						Authorization: "Bearer " + localStorage.getItem("accessToken"),
 						token: token.id,
-						amount: transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0)
+						amount: transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0)
 					},
 				}
 			);
@@ -297,7 +297,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 								<StripeCheckout
 									stripeKey="pk_test_51O7JiaLsRgAdoykUXHQQVFQPZDxlatzA1LF6rBUQnY9awP4khMBHKRqY4T27YVvemrsz8VKwhzpG32SSGhyFIzk100p1E172jk" // Replace with your Stripe publishable key
 									token={handleToken}
-									amount={transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0) * 100} // Convert to cents
+									amount={transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0) * 100} // Convert to cents
 								/>
 							</div>
 						)}
