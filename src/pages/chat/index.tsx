@@ -102,6 +102,7 @@ const ChatPage = () => {
         content: inputMessage,
         senderId: patient?.electronicHealthRecordId,
         conversationId: selectedConversation?.conversationId,
+        token: localStorage.getItem("accessToken"),
         timestamp: new Date(),
         socketID: socket.id,
         randomId: Math.random()
