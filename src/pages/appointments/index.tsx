@@ -30,6 +30,8 @@ import {
   RefresherEventDetail,
   IonSegment,
   IonSegmentButton,
+  IonBackButton,
+  IonButtons,
 } from "@ionic/react";
 import { timerOutline } from "ionicons/icons";
 import { Route, Redirect, useHistory, useLocation } from "react-router";
@@ -223,7 +225,10 @@ const Appointments = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="ion-text-center" style={{ height: "80px" }}>
+        <IonButtons slot="start">
+          <IonBackButton defaultHref="/tabs/services"></IonBackButton>
+        </IonButtons>
+          <IonTitle>
             <b>My Appointments</b>
           </IonTitle>
         </IonToolbar>
