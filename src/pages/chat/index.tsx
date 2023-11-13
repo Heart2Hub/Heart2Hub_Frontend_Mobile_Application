@@ -14,6 +14,8 @@ import {
   IonItem,
   IonText,
   IonIcon,
+  IonBackButton,
+  IonButtons,
 } from "@ionic/react";
 import {
   MainContainer,
@@ -212,7 +214,10 @@ const ChatPage = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="ion-text-center" style={{ height: "80px" }}>
+        <IonButtons slot="start">
+          <IonBackButton defaultHref="/tabs/services"></IonBackButton>
+        </IonButtons>
+          <IonTitle>
             <b>Chat Assistance</b>
           </IonTitle>
         </IonToolbar>
