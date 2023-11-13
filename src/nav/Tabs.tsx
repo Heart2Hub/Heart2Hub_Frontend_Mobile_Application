@@ -35,6 +35,7 @@ import Finance from "../pages/finance";
 import InvoiceDetails from "../pages/finance/InvoiceDetails";
 import Transaction from "../pages/transactions";
 import Subsidies from "../pages/ehr/Subsidy";
+import ChatPage from "../pages/chat";
 
 const routes = [
   {
@@ -106,6 +107,10 @@ const routes = [
     component: <Transaction />,
   },
   {
+    path: "/tabs/services/chat",
+    component: <ChatPage />,
+  },
+  {
     path: "/tabs/ehr/subsidies",
     component: <Subsidies />,
   },
@@ -126,6 +131,7 @@ const Tabs: React.FC<any> = ({ isAuthenticated }) => (
       <Route exact path="/tabs/services/appointments/edit/:id" component={EditSelectDateTime} />
       <Route exact path="/tabs/services/finance" component={Finance} />
       <Route exact path="/tabs/services/transaction" component={Transaction} />
+      <Route exact path="/tabs/services/chat/:unit" component={ChatPage} />
       <Route exact path="/tabs/services/finance/invoice/:id" component={InvoiceDetails} />
       <Route exact path="/tabs/ehr" component={EHR} />
       <Route exact path="/tabs/ehr/subsidies" component={Subsidies} />
