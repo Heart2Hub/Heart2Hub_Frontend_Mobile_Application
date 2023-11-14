@@ -198,9 +198,9 @@ const Transaction: React.FC = () => {
 		const day = date.getDate().toString().padStart(2, '0');
 		const month = (date.getMonth() + 1).toString().padStart(2, '0');
 		const year = date.getFullYear();
-	      
+
 		return `${day}/${month}/${year}`;
-	      };
+	};
 
 	const handleTransactionClick = async (transaction: Transaction) => {
 		const invoiceId = await transactionApi.findInvoiceUsingTransaction(transaction.transactionId); // Implement this function
@@ -213,16 +213,16 @@ const Transaction: React.FC = () => {
 		history.push(
 			`/tabs/services/finance/invoice/${invoice?.invoiceId}`,
 			{
-			  invoiceId: invoice?.invoiceId,
-			  invoiceAmount: invoice?.invoiceAmount,
-			  invoiceDueDate: formattedDueDate,
-			  invoiceStatusEnum: invoice?.invoiceStatusEnum,
-			  listOfTransactionItem: invoice?.listOfTransactionItem,
-			  // arrived: invoice,
+				invoiceId: invoice?.invoiceId,
+				invoiceAmount: invoice?.invoiceAmount,
+				invoiceDueDate: formattedDueDate,
+				invoiceStatusEnum: invoice?.invoiceStatusEnum,
+				listOfTransactionItem: invoice?.listOfTransactionItem,
+				// arrived: invoice,
 			}
-		      );	      
-		};
-	      
+		);
+	};
+
 	useEffect(() => {
 		getPatientDetails();
 	}, []);
@@ -278,7 +278,7 @@ const Transaction: React.FC = () => {
 								<p>
 									Status:
 									<IonChip color={getChipColor(item.approvalStatusEnum)}>
-										{item.approvalStatusEnum}
+										{item.approvalStatusEnum === 'REJECTED' ? 'OUTSTANDING' : item.approvalStatusEnum}
 									</IonChip>
 								</p>
 							</IonLabel>

@@ -230,6 +230,9 @@ export const invoiceApi = {
     createTransaction(id: number, amount: number) {
       return axiosFetch.post(`${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`);
     },
+    createFailedTransaction(id: number, amount: number) {
+      return axiosFetch.post(`${REST_ENDPOINT}/transaction/createFailedTransaction/${id}/${amount}`);
+    },
     findTransactionWithInvoice(id: number) {
       return axiosFetch.get(`${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`);
     },

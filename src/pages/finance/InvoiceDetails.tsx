@@ -111,6 +111,14 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 	const [showTransactionModal, setShowTransactionModal] = useState(false);
 	const [transactionDetails, setTransactionDetails] = useState<Transaction | null>(null);
 
+	const [toastOpen, setToastOpen] = useState(false);
+	const [toastMessage, setToastMessage] = useState('');
+	const [toastType, setToastType] = useState('');
+
+	const handleToastClose = () => {
+		setToastOpen(false);
+	};
+
 	// const fetchInvoice = async () => {
 	// 	try {
 	// 		const response = await invoiceApi.findInvoice(Number(id));
@@ -233,8 +241,19 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 
 					// Check if the error message contains the specified string
 					if (errorMessage.includes("Error Encountered: Your card was declined")) {
+
+						const total = transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0);
+
+						const response = await transactionApi.createFailedTransaction(Number(id), total);
+						console.log(response.data);
+
 						console.log('Card Declined Error:', errorMessage);
-						// Handle the card declined error as needed
+
+						setToastType('error');
+						setToastMessage('Payment Failed, Please try again!');
+
+						setToastOpen(true);
+
 					} else {
 						const total = transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0);
 
@@ -242,6 +261,11 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 						console.log(response.data);
 
 						history.push('/tabs/services/finance');
+
+						setToastType('success');
+						setToastMessage('Payment Successful!');
+
+						setToastOpen(true);
 					}
 				} else {
 					console.log('Payment Error: ', error);
@@ -381,7 +405,13 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 								</IonList>
 							</IonContent>
 						</IonModal>
-
+						<IonToast
+							isOpen={toastOpen}
+							onDidDismiss={handleToastClose}
+							message={toastMessage}
+							color={toastType === 'success' ? 'success' : 'danger'}
+							duration={3000}
+						/>
 					</IonCardContent>
 				</IonCard>
 			</IonContent>
