@@ -12,6 +12,11 @@ export const imageServerApi = {
   uploadProfilePhoto(type: string, image: FormData | undefined) {
     return axiosFetch.post(`${IMAGE_SERVER}/upload/${type}`, image);
   },
+  getImageFromImageServer(type: string, image: string | undefined) {
+    return axiosFetch.get(`${IMAGE_SERVER}/images/${type}/${image}`, {
+      responseType: "blob",
+    });
+  },
 };
 
 export const staffApi = {
@@ -134,16 +139,17 @@ export const appointmentApi = {
       `${REST_ENDPOINT}/appointment/viewAllAppointmentsByRange?startDay=${startDay}&startMonth=${startMonth}&startYear=${startYear}&endDay=${endDay}&endMonth=${endMonth}&endYear=${endYear}&departmentName=${departmentName}&selectStaffId=0`
     );
   },
-  viewAllAppointmentsByDay(
-    date: string
-  ) {
+  viewAllAppointmentsByDay(date: string) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/appointment/viewAllAppointmentsByDay?date=${date}`
     );
   },
   update() {
+    return axiosFetch.get(`${REST_ENDPOINT}/appointment/update`);
+  },
+  getAppointmentDTOById(appointmentId: number) {
     return axiosFetch.get(
-      `${REST_ENDPOINT}/appointment/update`
+      `${REST_ENDPOINT}/appointment/getAppointmentDTOById?appointmentId=${appointmentId}`
     );
   },
 };
@@ -218,40 +224,48 @@ export const invoiceApi = {
       `${REST_ENDPOINT}/invoice/findTransactionItemOfInvoice/${id}`
     );
   },
-}
+};
 
-  export const transactionApi = {
-    getAllTransactionsOfPatientMobile(username: string) {
-      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobile/${username}`);
-    },
-    getAllTransactionsOfPatientMobileEarliest(username: string) {
-      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobileEarliest/${username}`);
-    },
-    createTransaction(id: number, amount: number) {
-      return axiosFetch.post(`${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`);
-    },
-    findTransactionWithInvoice(id: number) {
-      return axiosFetch.get(`${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`);
-    },
-  }
+export const transactionApi = {
+  getAllTransactionsOfPatientMobile(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobile/${username}`
+    );
+  },
+  getAllTransactionsOfPatientMobileEarliest(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobileEarliest/${username}`
+    );
+  },
+  createTransaction(id: number, amount: number) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`
+    );
+  },
+  findTransactionWithInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`
+    );
+  },
+};
 
-  export const subsidyApi = {
-    findAllSubsidiesOfPatient(username: string) {
-      return axiosFetch.get(`${REST_ENDPOINT}/subsidy/findAllSubsidiesOfPatient/${username}`);
-    },
-  }
+export const subsidyApi = {
+  findAllSubsidiesOfPatient(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/subsidy/findAllSubsidiesOfPatient/${username}`
+    );
+  },
+};
 
-  export const chatApi = {
-    createPatientConversation(from: number, to: number) {
-      return axiosFetch.post(
-        `${REST_ENDPOINT}/conversation/createPatientConversation?patientId1=${from}&staffId1=${to}`
-      );
-    },
-    getPatientConversation(id: number) {
-      return axiosFetch.get(
-        `${REST_ENDPOINT}/conversation/getPatientConversation?patientId=${id}`
-      );
-    }
-  }
-
-
+export const chatApi = {
+  createPatientConversation(from: number, to: number) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/conversation/createPatientConversation?patientId1=${from}&staffId1=${to}`
+    );
+  },
+  getPatientConversation(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/conversation/getPatientConversation?patientId=${id}`
+    );
+  },
+};
