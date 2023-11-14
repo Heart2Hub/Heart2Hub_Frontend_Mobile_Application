@@ -246,4 +246,17 @@ export const invoiceApi = {
     },
   }
 
+  export const chatApi = {
+    createPatientConversation(from: number, to: number) {
+      return axiosFetch.post(
+        `${REST_ENDPOINT}/conversation/createPatientConversation?patientId1=${from}&staffId1=${to}`
+      );
+    },
+    getPatientConversation(id: number) {
+      return axiosFetch.get(
+        `${REST_ENDPOINT}/conversation/getPatientConversation?patientId=${id}`
+      );
+    }
+  }
+
 

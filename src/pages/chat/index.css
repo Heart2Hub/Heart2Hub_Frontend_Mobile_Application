@@ -1,0 +1,35 @@
+/* src/theme/variables.css */
+.sent-message,
+.received-message {
+  display: inline-block;
+  clear: both;
+  max-width: 70%;
+  padding: 10px;
+  border-radius: 10px;
+  overflow: hidden; /* Ensure proper clearing of float */
+}
+
+.sent-message {
+    background-color: #007bff !important;
+    color: white;
+    border-bottom-right-radius: 0;
+    float: right;
+  }
+  
+.received-message {
+    background-color: #f4f4f4 !important;
+    color: #333;
+    border-bottom-left-radius: 0;
+    float: left;
+}
+
+.item-native {
+    background: black !important;
+}
+
+.time {
+    font-size: 12px;
+    color: grey;
+    clear: both; /* Ensure the timestamp is below the message */
+    margin-bottom: 10px;
+  }
