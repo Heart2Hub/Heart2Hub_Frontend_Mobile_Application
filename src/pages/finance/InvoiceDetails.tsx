@@ -104,10 +104,23 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 	const { id } = useParams<{ id: string }>();
 	const { state } = useLocation<Invoice>();
 	const [insuranceClaim, setInsuranceClaim] = useState<InsuranceClaim[]>([]);
+	const [invoiceData, setInvoiceData] = useState<Invoice[]>([]);
+
 	const [medishieldClaim, setMedishieldClaim] = useState<MedishieldClaim[]>([]);
 	const [transactionItem, setTransactionItem] = useState<TransactionItem[]>([]);
 	const [showTransactionModal, setShowTransactionModal] = useState(false);
 	const [transactionDetails, setTransactionDetails] = useState<Transaction | null>(null);
+
+	// const fetchInvoice = async () => {
+	// 	try {
+	// 		const response = await invoiceApi.findInvoice(Number(id));
+	// 		setInvoiceData(response.data);
+	// 		console.log(response.data)
+	// 		setShowTransactionModal(true);
+	// 	} catch (error) {
+	// 		console.error('Error fetching transaction details: ', error);
+	// 	}
+	// };
 
 	const fetchTransactionDetails = async () => {
 		try {
@@ -183,7 +196,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 		}
 	};
 
-	const formatTransactionDate = (dateArray:string) => {
+	const formatTransactionDate = (dateArray: string) => {
 		const year = dateArray[0];
 		const month = dateArray[1];
 		const day = dateArray[2];
@@ -194,29 +207,51 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 
 	const handleToken = async (token: any) => {
 		console.log(token);
-		console.log(transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0))
-		try {
-			const total = transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0)
-			const response = await transactionApi.createTransaction(Number(id), total);
-			console.log(response.data)
-			history.push('/tabs/services/finance');
-			await axios.post(
-				'http://localhost:8080/api/payment/charge', '',
-				// { token: token.id, amount: transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0) },
-				{
-					headers: {
-						Authorization: "Bearer " + localStorage.getItem("accessToken"),
-						token: token.id,
-						amount: transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0)
-					},
-				}
-			);
+		console.log(transactionItem.reduce((total, item) => total + item.transactionItemPrice, 0));
 
-			console.log('Payment Success');
+		try {
+
+
+			try {
+				const response2 = await axios.post(
+					'http://localhost:8080/api/payment/charge', '',
+					{
+						headers: {
+							Authorization: "Bearer " + localStorage.getItem("accessToken"),
+							token: token.id,
+							amount: transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0)
+						},
+					}
+				);
+
+				console.log(response2.data);
+				console.log('Payment Success');
+			} catch (error) {
+				// Type assertion to treat the error object as 'any'
+				if ((error as any).response && (error as any).response.status === 400) {
+					const errorMessage = (error as any).response.data;
+
+					// Check if the error message contains the specified string
+					if (errorMessage.includes("Error Encountered: Your card was declined")) {
+						console.log('Card Declined Error:', errorMessage);
+						// Handle the card declined error as needed
+					} else {
+						const total = transactionItem.reduce((total, item) => total + item.transactionItemPrice * item.transactionItemQuantity, 0);
+
+						const response = await transactionApi.createTransaction(Number(id), total);
+						console.log(response.data);
+
+						history.push('/tabs/services/finance');
+					}
+				} else {
+					console.log('Payment Error: ', error);
+				}
+			}
 		} catch (error) {
-			console.log('Payment Error: ', error);
+			console.log('Error outside axios request:', error);
 		}
 	};
+
 
 	return (
 		<IonPage>

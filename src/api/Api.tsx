@@ -233,6 +233,11 @@ export const invoiceApi = {
     findTransactionWithInvoice(id: number) {
       return axiosFetch.get(`${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`);
     },
+    findInvoiceUsingTransaction(id: number) {
+      return axiosFetch.get(
+        `${REST_ENDPOINT}/invoice/findInvoiceUsingTransaction/${id}`
+      );
+    },
   }
 
   export const subsidyApi = {
