@@ -28,7 +28,7 @@ import {
 } from "@ionic/react";
 import { personCircle, logOut, repeat, arrowForward } from "ionicons/icons";
 import { Route, Redirect, useHistory } from "react-router";
-import { patientApi } from "../../api/Api";
+import { patientApi, imageServerApi } from "../../api/Api";
 import { IMAGE_SERVER } from "../../constants/RestEndPoint";
 
 type Props = {};
@@ -59,6 +59,11 @@ const Settings = () => {
   const storedUsername = localStorage.getItem("username");
   const history = useHistory();
   const [patient, setPatient] = useState<Patient>();
+  const [profilePicture, setProfilePicture] = useState<Blob>();
+
+  function createBlobUrl(blob: Blob) {
+    return URL.createObjectURL(blob);
+  }
 
   useEffect(() => {
     const getPatientDetails = async () => {
@@ -70,6 +75,23 @@ const Settings = () => {
         )[0];
         //console.log(currPatient);
         setPatient(currPatient);
+
+        console.log(currPatient);
+
+        const formData = new FormData();
+        formData.append("image", currPatient?.profilePicture);
+
+        const imageResponse = await imageServerApi.getImageFromImageServer(
+          "id",
+          currPatient?.profilePicture
+        );
+
+        console.log(imageResponse.data);
+
+        const imageBlob = new Blob([imageResponse.data], {
+          type: imageResponse.headers["content-type"],
+        });
+        setProfilePicture(imageBlob);
       } catch (error) {
         console.log(error);
       }
@@ -100,7 +122,7 @@ const Settings = () => {
             >
               <img
                 alt="Silhouette of a person's head"
-                src={IMAGE_SERVER + "/images/id/" + patient?.profilePicture}
+                src={profilePicture && URL.createObjectURL(profilePicture)}
               />
             </IonAvatar>
             <IonLabel>

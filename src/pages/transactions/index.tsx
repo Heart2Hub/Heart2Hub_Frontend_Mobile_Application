@@ -192,6 +192,37 @@ const Transaction: React.FC = () => {
 				return 'medium';
 		}
 	};
+
+	const formatDueDate = (dueDateArray: number[]) => {
+		const date = new Date(dueDateArray[0], dueDateArray[1] - 1, dueDateArray[2]);
+		const day = date.getDate().toString().padStart(2, '0');
+		const month = (date.getMonth() + 1).toString().padStart(2, '0');
+		const year = date.getFullYear();
+
+		return `${day}/${month}/${year}`;
+	};
+
+	const handleTransactionClick = async (transaction: Transaction) => {
+		const invoiceId = await transactionApi.findInvoiceUsingTransaction(transaction.transactionId); // Implement this function
+		console.log(invoiceId)
+		const response = await invoiceApi.findInvoice(invoiceId.data);
+		const invoice = response.data;
+		console.log(response.data)
+		const formattedDueDate = formatDueDate(invoice?.invoiceDueDate);
+
+		history.push(
+			`/tabs/services/finance/invoice/${invoice?.invoiceId}`,
+			{
+				invoiceId: invoice?.invoiceId,
+				invoiceAmount: invoice?.invoiceAmount,
+				invoiceDueDate: formattedDueDate,
+				invoiceStatusEnum: invoice?.invoiceStatusEnum,
+				listOfTransactionItem: invoice?.listOfTransactionItem,
+				// arrived: invoice,
+			}
+		);
+	};
+
 	useEffect(() => {
 		getPatientDetails();
 	}, []);
@@ -237,8 +268,8 @@ const Transaction: React.FC = () => {
 					{filteredAndSortedTransactions().map((item) => (
 						<IonItem
 							key={item.transactionId}
-						// button
-						// onClick={() => handleClickInvoice(invoice)}
+							button  // Enable the item as a clickable button
+							onClick={() => handleTransactionClick(item)}
 						>
 							<IonLabel>
 								<h2>Transaction ID: {item.transactionId}</h2>
@@ -247,9 +278,10 @@ const Transaction: React.FC = () => {
 								<p>
 									Status:
 									<IonChip color={getChipColor(item.approvalStatusEnum)}>
-										{item.approvalStatusEnum}
+										{item.approvalStatusEnum === 'REJECTED' ? 'OUTSTANDING' : item.approvalStatusEnum}
 									</IonChip>
-								</p>							</IonLabel>
+								</p>
+							</IonLabel>
 						</IonItem>
 					))}
 				</IonList>

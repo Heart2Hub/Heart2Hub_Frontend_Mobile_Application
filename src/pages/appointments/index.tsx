@@ -53,6 +53,7 @@ interface Appointment {
   currentAssignedStaffId: number;
   arrived: boolean;
   staffDetails: Staff;
+  swimlaneStatusEnum: string;
 }
 
 interface Staff {
@@ -82,6 +83,10 @@ const Appointments = () => {
       const username = localStorage.getItem("username") ?? "";
       const response = await appointmentApi.viewPatientAppointments(username);
       const a = response.data;
+
+      console.log(a);
+
+      //get staff data
       for (let i = 0; i < a.length; i++) {
         try {
           if (a[i].currentAssignedStaffId) {
@@ -94,6 +99,8 @@ const Appointments = () => {
           console.log(error);
         }
       }
+
+      //sort the appts by actual date time
       a.sort(compareByActualDateTime);
       const pastAppts = a.filter((appointment: Appointment) =>
         isAppointmentPast(appointment)
@@ -163,6 +170,7 @@ const Appointments = () => {
         staffDetails: appointment.staffDetails ? appointment.staffDetails : "",
         department: appointment.departmentName,
         arrived: appointment.arrived,
+        swimlaneStatusEnum: appointment.swimlaneStatusEnum,
       }
     );
   };
@@ -196,20 +204,21 @@ const Appointments = () => {
   }
 
   const isAppointmentPast = (appointment: Appointment) => {
-    const dt = appointment.bookedDateTime;
-    const [year, month, day, hour, minute] = dt.map(Number);
+    return appointment.swimlaneStatusEnum == "DONE";
+    // const dt = appointment.bookedDateTime;
+    // const [year, month, day, hour, minute] = dt.map(Number);
 
-    const targetDate = dayjs()
-      .set("year", year)
-      .set("month", month - 1)
-      .set("day", day - 1)
-      .set("hour", hour)
-      .set("minute", minute);
-    const currentDate = dayjs();
-    if (currentDate.isAfter(targetDate)) {
-      return true;
-    }
-    return false;
+    // const targetDate = dayjs()
+    //   .set("year", year)
+    //   .set("month", month - 1)
+    //   .set("day", day - 1)
+    //   .set("hour", hour)
+    //   .set("minute", minute);
+    // const currentDate = dayjs();
+    // if (currentDate.isAfter(targetDate)) {
+    //   return true;
+    // }
+    // return false;
   };
 
   const handleSegmentChange = (event: CustomEvent) => {
@@ -225,9 +234,9 @@ const Appointments = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-        <IonButtons slot="start">
-          <IonBackButton defaultHref="/tabs/services"></IonBackButton>
-        </IonButtons>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/tabs/services"></IonBackButton>
+          </IonButtons>
           <IonTitle>
             <b>My Appointments</b>
           </IonTitle>
@@ -292,27 +301,49 @@ const Appointments = () => {
           </>
         ) : (
           <>
-            {/* {pastAppts.map((appointment) => 
-            <IonCard onClick={() => handleClickAppt(appointment)} key={appointment.appointmentId}>
-            <IonCardHeader>
-              {appointment.staffDetails ? 
-              <IonCardTitle style={{ fontSize: "20px"}}>Appointment with <br/>Dr. {appointment.staffDetails.firstname + " " + appointment.staffDetails.lastname}</IonCardTitle> :
-              <IonCardTitle style={{ fontSize: "20px"}}>Appointment</IonCardTitle>}
-            </IonCardHeader>
-            <IonCardContent>
-            <IonText style={{ fontSize: "16px"}}>{appointment.departmentName}</IonText>
-              <IonList> 
-                <IonItem>
-                  <IonIcon slot="start" icon={timerOutline} />
-                  <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[0] + ' ' + getDateTime(appointment.actualDateTime).split(" ")[1]}</IonLabel>
-                </IonItem>
-                <IonItem>
-                <IonIcon slot="start" />
-                  <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[2]}</IonLabel>
-                </IonItem>
-              </IonList>
-            </IonCardContent>
-          </IonCard>)} */}
+            {pastAppts.map((appointment) => (
+              <IonCard
+                onClick={() => handleClickAppt(appointment)}
+                key={appointment.appointmentId}
+              >
+                <IonCardHeader>
+                  {appointment.staffDetails ? (
+                    <IonCardTitle style={{ fontSize: "20px" }}>
+                      Appointment with <br />
+                      Dr.{" "}
+                      {appointment.staffDetails.firstname +
+                        " " +
+                        appointment.staffDetails.lastname}
+                    </IonCardTitle>
+                  ) : (
+                    <IonCardTitle style={{ fontSize: "20px" }}>
+                      Appointment
+                    </IonCardTitle>
+                  )}
+                </IonCardHeader>
+                <IonCardContent>
+                  <IonText style={{ fontSize: "16px" }}>
+                    {appointment.departmentName}
+                  </IonText>
+                  <IonList>
+                    <IonItem>
+                      <IonIcon slot="start" icon={timerOutline} />
+                      <IonLabel>
+                        {getDateTime(appointment.actualDateTime).split(" ")[0] +
+                          " " +
+                          getDateTime(appointment.actualDateTime).split(" ")[1]}
+                      </IonLabel>
+                    </IonItem>
+                    <IonItem>
+                      <IonIcon slot="start" />
+                      <IonLabel>
+                        {getDateTime(appointment.actualDateTime).split(" ")[2]}
+                      </IonLabel>
+                    </IonItem>
+                  </IonList>
+                </IonCardContent>
+              </IonCard>
+            ))}
           </>
         )}
       </IonContent>
