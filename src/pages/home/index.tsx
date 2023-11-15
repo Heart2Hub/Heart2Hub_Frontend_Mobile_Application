@@ -30,6 +30,9 @@ import {
   appointmentApi,
   staffApi,
   patientRequestApi,
+  admissionApi,
+  medicationOrderApi,
+  inpatientTreatmentApi,
 } from "../../api/Api";
 import {
   personCircle,
@@ -51,6 +54,7 @@ import { OverlayEventDetail } from "@ionic/core";
 import showerIcon from "../../assets/shower-solid.svg";
 import waterIcon from "../../assets/glass-water-solid.svg";
 import toiletIcon from "../../assets/toilet-solid.svg";
+import moment, { Moment } from "moment";
 
 type Patient = {
   patientId: number;
@@ -85,6 +89,16 @@ interface Appointment {
   dispensaryStatusEnum: string;
 }
 
+interface Order {
+  medications: string[];
+  treatment: string;
+  startDate: string;
+  endDate: string;
+  staff: string;
+  location: string;
+  comments: string;
+}
+
 //TODO: create a 'models' folder with our diff entities
 interface Ehr {
   firstName: string;
@@ -104,6 +118,8 @@ const Home = () => {
     BATH: false,
   });
   const [requestCount, setRequestCount] = useState(0);
+  const [currAdmission, setCurrAdmission] = useState<any>();
+  const [admissionStaffs, setAdmissionStaffs] = useState<Staff[]>([]);
 
   const date = dayjs();
 
@@ -357,6 +373,421 @@ const Home = () => {
     );
   };
 
+  //START OF ADMISSION TIMELINE
+  const [admissionDate, setAdmissionDate] = useState("");
+  const [dischargeDate, setDischargeDate] = useState("");
+  //const [orders, setOrders] = useState<Order[]>();
+  const [orders, setOrders] = useState<Moment[]>([]);
+  const [orderMap, setOrderMap] = useState<any>();
+  const [recentOrder, setRecentOrder] = useState<Moment>();
+
+  const getAdmissionToday = async () => {
+    try {
+      const response = await admissionApi.getAllAdmissions();
+      const admission = response.data.filter(
+        (row: any) => row.username === storedUsername
+      )[0];
+      if (admission) {
+        let admissionDateTime = admission.admissionDateTime;
+        if (admissionDateTime.length > 6) {
+          admissionDateTime.pop();
+        }
+        const admissionMoment = moment(admissionDateTime);
+        admissionMoment.subtract(1, "months");
+        setAdmissionDate(admissionMoment.format("DD/MM/YYYY HH:mmA"));
+
+        const dischargeMoment = moment(admission.dischargeDateTime);
+        dischargeMoment.subtract(1, "months");
+        setDischargeDate(dischargeMoment.format("DD/MM/YYYY HH:mmA"));
+
+        if (moment().isBetween(admissionMoment, dischargeMoment)) {
+          //console.log(admission);
+          setCurrAdmission(admission);
+
+          const staffPromises = admission.listOfStaffsId.map((id: number) =>
+            staffApi.getStaffById(id)
+          );
+          const staffResponse = await Promise.all(staffPromises);
+          const listOfStaff = staffResponse.map((response) => response.data);
+
+          setAdmissionStaffs(listOfStaff);
+
+          const medicationOrders = await getMedicationOrders(
+            admission.listOfMedicationOrderIds
+          );
+
+          const inpatientTreatments = await getInpatientTreatments(
+            admission.listOfInpatientTreatmentIds
+          );
+
+          const dateToOrdersMap: any = {};
+
+          for (const medicationOrder of medicationOrders) {
+            const startDate = medicationOrder.startDate;
+
+            if (!dateToOrdersMap.hasOwnProperty(startDate)) {
+              dateToOrdersMap[startDate] = [medicationOrder];
+            } else {
+              dateToOrdersMap[startDate].push(medicationOrder);
+            }
+          }
+
+          for (const inpatientTreatment of inpatientTreatments) {
+            const startDate = inpatientTreatment.startDate;
+            dateToOrdersMap[startDate] = inpatientTreatment;
+          }
+          setOrderMap(dateToOrdersMap);
+
+          const timelineEventDates = Object.keys(dateToOrdersMap);
+          //console.log(timelineEventDates);
+          //TODO: conver to moments and sort timelineEventDates
+          const timelineEventMoments = timelineEventDates.map((date) =>
+            moment(date)
+          );
+          timelineEventMoments.sort((a, b) => (a.isBefore(b) ? -1 : 1));
+
+          setOrders(timelineEventMoments);
+
+          //find the most recent order
+          let lastOrder = true;
+          for (let i = 0; i < timelineEventMoments.length; i++) {
+            const eventMoment = timelineEventMoments[i];
+            if (eventMoment.isAfter(moment())) {
+              lastOrder = false;
+              setRecentOrder(timelineEventMoments[i - 1]);
+              break;
+            }
+          }
+
+          if (lastOrder) {
+            setRecentOrder(
+              timelineEventMoments[timelineEventMoments.length - 1]
+            );
+          }
+        } else {
+          setCurrAdmission(null);
+        }
+      } else {
+        setCurrAdmission(null);
+      }
+    } catch (error) {}
+  };
+
+  // interface Order {
+  //   medications: string[];
+  //   treatment: string;
+  //   startDate: string;
+  //   endDate: string;
+  //   staff: string;
+  //   location: string;
+  //   comments: string;
+  // }
+
+  //helper method to get medication orders from medication order ids
+  const getMedicationOrders = async (medicationOrderIds: number[]) => {
+    const medicationOrderPromises = medicationOrderIds.map((id) =>
+      medicationOrderApi.getMedicationOrderById(id)
+    );
+    const medicationOrderResponses = await Promise.all(medicationOrderPromises);
+    const listOfMedicationOrders = medicationOrderResponses.map(
+      (response) => response.data
+    );
+
+    return listOfMedicationOrders;
+  };
+
+  //helper method to get inpatient treatments from inpatient treatment ids
+  const getInpatientTreatments = async (inpatientTreatmentIds: number[]) => {
+    const inpatientTreatmentPromises = inpatientTreatmentIds.map((id) =>
+      inpatientTreatmentApi.getInpatientTreatmentById(id)
+    );
+    const inpatientTreatmentResponses = await Promise.all(
+      inpatientTreatmentPromises
+    );
+    const listOfInpatientTreatments = inpatientTreatmentResponses.map(
+      (response) => response.data
+    );
+    //console.log(listOfMedicationOrders);
+    return listOfInpatientTreatments;
+  };
+
+  const showAdmissionEventCard = (admission: any, here: boolean) => {
+    if (admission) {
+      //console.log(admission);
+      //console.log(admissionStaffs);
+      const admin = admissionStaffs.filter(
+        (staff) => staff.staffRoleEnum === "ADMIN"
+      );
+
+      let adminName = "";
+      if (admin.length > 0) {
+        adminName =
+          admin[0].staffRoleEnum +
+          " " +
+          admin[0].firstname +
+          " " +
+          admin[0].lastname;
+      }
+      return (
+        <VerticalTimelineElement
+          className="vertical-timeline-element--work"
+          contentStyle={{
+            background: getColor("REGISTRATION"),
+            color: "#fff",
+          }}
+          contentArrowStyle={{
+            borderRight: `7px solid  ${getColor("REGISTRATION")}`,
+          }}
+          date={
+            admin.length === 0 ? "Staff: Unassigned" : `Staff: ${adminName}`
+          }
+          iconStyle={{ background: getColor("REGISTRATION"), color: "#fff" }}
+        >
+          <h4
+            className="vertical-timeline-element-title"
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <b>REGISTRATION</b>
+            {admission.listOfMedicationOrderIds.length === 0 &&
+              admission.listOfInpatientTreatmentIds.length && (
+                <IonBadge
+                  style={{
+                    paddingTop: 8,
+                    fontSize: "9px",
+                    backgroundColor: "yellow",
+                    color: "black",
+                  }}
+                >
+                  <span
+                    style={{
+                      height: "6px",
+                      width: "6px",
+                      backgroundColor: "red",
+                      borderRadius: "50%",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  &nbsp; YOU ARE HERE
+                </IonBadge>
+              )}
+          </h4>
+          <h6 className="vertical-timeline-element-subtitle">
+            {`Ward ${admission.ward}`}
+          </h6>
+          <p style={{ fontSize: "15px" }}>
+            <b>Date/Time:</b> {admissionDate}
+            <br />
+            <b>Location:</b> test
+            <br />
+            <b>Arrived:</b>{" "}
+            <IonBadge
+              style={{
+                paddingTop: 3,
+                paddingBottom: 5,
+                marginBottom: -7,
+                color: admission.arrived ? "green" : "red",
+                backgroundColor: "rgb(255,255,255,1)",
+              }}
+            >
+              {admission.arrived ? "Yes" : "No"}
+            </IonBadge>
+          </p>
+        </VerticalTimelineElement>
+      );
+    }
+  };
+
+  const showMedicationOrderEvent = (
+    admission: any,
+    medicationOrders: any[],
+    startDate: Moment,
+    here: boolean
+  ) => {
+    if (admission) {
+      const nurse = admissionStaffs.filter(
+        (staff) => staff.staffRoleEnum === "NURSE"
+      );
+      let nurseName = "";
+      if (nurse.length > 0) {
+        nurseName =
+          nurse[0].staffRoleEnum +
+          " " +
+          nurse[0].firstname +
+          " " +
+          nurse[0].lastname;
+      }
+
+      return (
+        <VerticalTimelineElement
+          className="vertical-timeline-element--work"
+          contentStyle={{
+            background: getColor("TRIAGE"),
+            color: "#fff",
+          }}
+          contentArrowStyle={{
+            borderRight: `7px solid  ${getColor("TRIAGE")}`,
+          }}
+          date={
+            nurse.length === 0 ? "Staff: Unassigned" : `Staff: ${nurseName}`
+          }
+          iconStyle={{ background: getColor("TRIAGE"), color: "#fff" }}
+        >
+          <h4
+            className="vertical-timeline-element-title"
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <b>MEDICATION</b>
+            {here && (
+              <IonBadge
+                style={{
+                  paddingTop: 8,
+                  fontSize: "9px",
+                  backgroundColor: "yellow",
+                  color: "black",
+                }}
+              >
+                <span
+                  style={{
+                    height: "6px",
+                    width: "6px",
+                    backgroundColor: "red",
+                    borderRadius: "50%",
+                    display: "inline-block",
+                  }}
+                ></span>
+                &nbsp; YOU ARE HERE
+              </IonBadge>
+            )}
+          </h4>
+          <h6 className="vertical-timeline-element-subtitle">
+            {`Ward ${admission.ward}`}
+          </h6>
+          <p style={{ fontSize: "15px" }}>
+            <b>Date/Time:</b> {startDate.format("DD/MM/YYYY HH:mmA")}
+            <br />
+            {medicationOrders.map((medicationOrder: any) => {
+              console.log(medicationOrder);
+              return (
+                <>
+                  <b>Medication:</b>{" "}
+                  {medicationOrder.medication.inventoryItemName}
+                  <br />
+                </>
+              );
+            })}
+            {/* <b>Arrived:</b>{" "}
+            <IonBadge
+              style={{
+                paddingTop: 3,
+                paddingBottom: 5,
+                marginBottom: -7,
+                color: admission.arrived ? "green" : "red",
+                backgroundColor: "rgb(255,255,255,1)",
+              }}
+            >
+              {admission.arrived ? "Yes" : "No"}
+            </IonBadge> */}
+          </p>
+        </VerticalTimelineElement>
+      );
+    }
+  };
+
+  const showInpatientTreatmentEvent = (
+    admission: any,
+    inpatientTreatment: any,
+    startDate: Moment,
+    here: boolean
+  ) => {
+    if (admission) {
+      // const treatmentStaff = admissionStaffs.filter(
+      //   (staff) =>
+      //     staff.staffRoleEnum !== "ADMIN" &&
+      //     staff.staffRoleEnum !== "NURSE" &&
+      //     staff.staffRoleEnum !== "DOCTOR"
+      // );
+      // let staffName = "";
+
+      // if (treatmentStaff.length > 0) {
+      //   console.log(treatmentStaff[0]);
+      //   staffName =
+      //     treatmentStaff[0].staffRoleEnum +
+      //     " " +
+      //     treatmentStaff[0].firstname +
+      //     " " +
+      //     treatmentStaff[0].lastname;
+      // }
+      const staffName = inpatientTreatment.createdBy.split("(")[0];
+      const staffRole = inpatientTreatment.createdBy.split("(")[1].slice(0, -1);
+
+      return (
+        <VerticalTimelineElement
+          className="vertical-timeline-element--work"
+          contentStyle={{
+            background: getColor("CONSULTATION"),
+            color: "#fff",
+          }}
+          contentArrowStyle={{
+            borderRight: `7px solid  ${getColor("CONSULTATION")}`,
+          }}
+          date={`${staffRole} ${staffName}`}
+          iconStyle={{ background: getColor("CONSULTATION"), color: "#fff" }}
+        >
+          <h4
+            className="vertical-timeline-element-title"
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <b>TREATMENT</b>
+            {here && (
+              <IonBadge
+                style={{
+                  paddingTop: 8,
+                  fontSize: "9px",
+                  backgroundColor: "yellow",
+                  color: "black",
+                }}
+              >
+                <span
+                  style={{
+                    height: "6px",
+                    width: "6px",
+                    backgroundColor: "red",
+                    borderRadius: "50%",
+                    display: "inline-block",
+                  }}
+                ></span>
+                &nbsp; YOU ARE HERE
+              </IonBadge>
+            )}
+          </h4>
+          <h6 className="vertical-timeline-element-subtitle">
+            {`Ward ${admission.ward}`}
+          </h6>
+          <p style={{ fontSize: "15px" }}>
+            <b>Date/Time:</b> {startDate.format("DD/MM/YYYY HH:mmA")}
+            <br />
+            <b>Treatment:</b> {inpatientTreatment.serviceItem.inventoryItemName}
+            <br />
+            <b>Arrived:</b>{" "}
+            <IonBadge
+              style={{
+                paddingTop: 3,
+                paddingBottom: 5,
+                marginBottom: -7,
+                color: inpatientTreatment.arrived ? "green" : "red",
+                backgroundColor: "rgb(255,255,255,1)",
+              }}
+            >
+              {inpatientTreatment.arrived ? "Yes" : "No"}
+            </IonBadge>
+          </p>
+        </VerticalTimelineElement>
+      );
+    }
+  };
+
+  //END OF ADMISSION TIMELINE
+
   const getApptData = useCallback(async () => {
     try {
       getAppointmentToday();
@@ -460,6 +891,7 @@ const Home = () => {
       getPatientDetails();
     } else {
       getAppointmentToday();
+      getAdmissionToday();
       setupSSEListener();
       // const interval = setInterval(() => {
       //   getApptData()
@@ -964,6 +1396,48 @@ const Home = () => {
                   </div>
                 </IonAccordion>
               ))}
+
+              <IonAccordion value="two">
+                <IonItem slot="header" color="light">
+                  <IonLabel>Admission</IonLabel>
+                </IonItem>
+                <div slot="content">
+                  <VerticalTimeline lineColor={getColor("REGISTRATION")}>
+                    <>
+                      {showAdmissionEventCard(currAdmission, true)}
+                      {/* {showMedicationOrderEvent(
+                        currAdmission,
+                        orderMap[orders[0]],
+                        orders[0],
+                        true
+                      )} */}
+                      {orders.map((order) => {
+                        const orderString = order.format("YYYY-MM-DD HH:mm:ss");
+                        const orderDetails = orderMap[orderString];
+                        console.log(orderDetails);
+
+                        if (Array.isArray(orderDetails)) {
+                          //console.log(orderDetails);
+                          //console.log(currAdmission);
+                          return showMedicationOrderEvent(
+                            currAdmission,
+                            orderDetails,
+                            order,
+                            order.isSame(recentOrder)
+                          );
+                        } else {
+                          return showInpatientTreatmentEvent(
+                            currAdmission,
+                            orderDetails,
+                            order,
+                            order.isSame(recentOrder)
+                          );
+                        }
+                      })}
+                    </>
+                  </VerticalTimeline>
+                </div>
+              </IonAccordion>
             </IonAccordionGroup>
           </>
         ) : (
