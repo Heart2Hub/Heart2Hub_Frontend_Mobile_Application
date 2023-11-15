@@ -49,6 +49,7 @@ interface Appointment {
   description: string;
   comments: string;
   bookedDateTime: string[];
+  actualDateTime: string[];
   departmentName: string;
   currentAssignedStaffId: number;
   arrived: boolean;

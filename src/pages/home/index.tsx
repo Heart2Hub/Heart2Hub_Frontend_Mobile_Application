@@ -91,8 +91,10 @@ const Home = () => {
       return "#9b59b6"
     } else if (tab === "ADMISSION") {
       return "#e67e22"
-    } else {
+    } else if (tab === "DISCHARGE") {
       return "#34495e"
+    } else {
+      return "#ffb700"
     }
   }
 
@@ -227,6 +229,33 @@ const Home = () => {
     )
   }
 
+  const showDoneCard = (appointment: any) => {
+    return (
+    <VerticalTimelineElement
+        className="vertical-timeline-element--work"
+        contentStyle={{ background: '#ffb700', color: '#000' }}
+        contentArrowStyle={{ borderRight: `7px solid #ffb700` }}
+        iconStyle={{ background: '#ffb700', color: '#000' }}
+      >
+        <h4 className="vertical-timeline-element-title" style={{ display: "flex", justifyContent: "space-between"}}>
+          <b>DONE</b>
+          <IonBadge style={{ paddingTop: 8, fontSize: '9px', backgroundColor: 'yellow', color: 'black'}}>
+            <span 
+              style={{ height: "6px", 
+              width: "6px", 
+              backgroundColor: 'red', 
+              borderRadius: "50%", 
+              display: "inline-block"}}></span>&nbsp;
+            YOU ARE HERE
+          </IonBadge>
+        </h4>
+        <h6 className="vertical-timeline-element-subtitle">{appointment.departmentName}</h6>
+        <p style={{ fontSize: "15px"}}>
+          <b>You have been discharged successfully! Thank you for choosing Heart2Hub.</b>
+        </p>
+      </VerticalTimelineElement>)
+  }
+
   const getApptData = useCallback(async () => {
       try {
         getAppointmentToday();
@@ -320,10 +349,6 @@ const Home = () => {
     else {
       getAppointmentToday()
       setupSSEListener();
-      // const interval = setInterval(() => {
-      //   getApptData()
-      // }, 10000);
-      // return () => clearInterval(interval)
     }
   }, [patient, getApptData]);
 
@@ -404,7 +429,7 @@ const Home = () => {
             
             appointment.swimlaneStatusEnum === "PHARMACY" ?
               <>
-                {/* // Consultation -> Pharmacy */}
+                {/* // Consultation -> Pharmacy (unassigned) */}
                 {appointment.listOfStaffsId.length === 3 ?
                 <>
                   {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
@@ -412,6 +437,14 @@ const Home = () => {
                   {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
                   {showTimelineCard(appointment, "PHARMACY", appointment.arrived ? "Yes" : "No", true)}
                 </> :
+                // Consultation -> Pharmacy (assigned)
+                appointment.listOfStaffsId.length === 4 && appointment.currentAssignedStaffId != null?
+                  <>
+                    {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                    {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                    {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                    {showTimelineCard(appointment, "PHARMACY", appointment.arrived ? "Yes" : "No", true)}
+                  </> :
                 // Consultation -> Treatment -> Consultation -> Pharmacy
                 appointment.listOfStaffsId.length >= 4 ?
                 <>
@@ -436,7 +469,7 @@ const Home = () => {
                 {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
                 {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
                 {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
-                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", appointment.swimlaneStatusEnum !== "DONE")}
               </> : 
               
               // Consultation -> Pharmacy -> Discharge
@@ -446,11 +479,11 @@ const Home = () => {
                 {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
                 {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
                 {showTimelineCard(appointment, "PHARMACY", "Yes", false)}
-                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", appointment.swimlaneStatusEnum !== "DONE")}
               </> : 
 
               // Consultation -> Treatment -> Consultation -> Pharmacy -> Discharge
-              getNumberOfRoles(appointment.listOfStaffsId).includes("PHARMACIST") && getNumberOfRoles(appointment.listOfStaffsId).length > 4?
+              getNumberOfRoles(appointment.listOfStaffsId).includes("PHARMACIST") && getNumberOfRoles(appointment.listOfStaffsId).length > 4 ?
               <>
                 {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
                 {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
@@ -458,16 +491,37 @@ const Home = () => {
                 {showTimelineCard(appointment, "TREATMENT", "Yes", false)}
                 {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
                 {showTimelineCard(appointment, "PHARMACY", "Yes", false)}
-                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", appointment.swimlaneStatusEnum !== "DONE")}
               </> : 
 
               // Pharmacy -> Discharge
               <>
                 {showTimelineCard(appointment, "PHARMACY", "Yes", false)}
-                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", true)}
+                {showTimelineCard(appointment, "DISCHARGE", appointment.arrived ? "Yes" : "No", appointment.swimlaneStatusEnum !== "DONE")}
               </>}
+              {appointment.swimlaneStatusEnum === "DONE" ? 
+              <>{showDoneCard(appointment)}</> : null}
             </>
-              : null}
+              : 
+              appointment.swimlaneStatusEnum === "ADMISSION" ?
+              <>
+              {/* Consultation -> Admission */}
+              {appointment.listOfStaffsId.length === 3 ?
+                <>
+                {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "ADMISSION", appointment.arrived ? "Yes" : "No", true)}
+                </>
+              : <>
+                 {showTimelineCard(appointment, "REGISTRATION", "Yes", false)}
+                {showTimelineCard(appointment, "TRIAGE", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "TREATMENT", "Yes", false)}
+                {showTimelineCard(appointment, "CONSULTATION", "Yes", false)}
+                {showTimelineCard(appointment, "ADMISSION", appointment.arrived ? "Yes" : "No", true)}
+              </>}
+              </> : <></>}
           </VerticalTimeline>
           </div>
           </IonAccordion>)}
