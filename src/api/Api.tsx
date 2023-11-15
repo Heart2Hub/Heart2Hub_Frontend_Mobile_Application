@@ -226,28 +226,38 @@ export const invoiceApi = {
   },
 };
 
-  export const transactionApi = {
-    getAllTransactionsOfPatientMobile(username: string) {
-      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobile/${username}`);
-    },
-    getAllTransactionsOfPatientMobileEarliest(username: string) {
-      return axiosFetch.get(`${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobileEarliest/${username}`);
-    },
-    createTransaction(id: number, amount: number) {
-      return axiosFetch.post(`${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`);
-    },
-    createFailedTransaction(id: number, amount: number) {
-      return axiosFetch.post(`${REST_ENDPOINT}/transaction/createFailedTransaction/${id}/${amount}`);
-    },
-    findTransactionWithInvoice(id: number) {
-      return axiosFetch.get(`${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`);
-    },
-    findInvoiceUsingTransaction(id: number) {
-      return axiosFetch.get(
-        `${REST_ENDPOINT}/invoice/findInvoiceUsingTransaction/${id}`
-      );
-    },
-  }
+export const transactionApi = {
+  getAllTransactionsOfPatientMobile(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobile/${username}`
+    );
+  },
+  getAllTransactionsOfPatientMobileEarliest(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/transaction/getAllTransactionsOfPatientMobileEarliest/${username}`
+    );
+  },
+  createTransaction(id: number, amount: number) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/transaction/createTransaction/${id}/${amount}`
+    );
+  },
+  createFailedTransaction(id: number, amount: number) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/transaction/createFailedTransaction/${id}/${amount}`
+    );
+  },
+  findTransactionWithInvoice(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/transaction/findTransactionWithInvoice/${id}`
+    );
+  },
+  findInvoiceUsingTransaction(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/invoice/findInvoiceUsingTransaction/${id}`
+    );
+  },
+};
 
 export const subsidyApi = {
   findAllSubsidiesOfPatient(username: string) {
@@ -266,6 +276,24 @@ export const chatApi = {
   getPatientConversation(id: number) {
     return axiosFetch.get(
       `${REST_ENDPOINT}/conversation/getPatientConversation?patientId=${id}`
+    );
+  },
+};
+
+export const patientRequestApi = {
+  getPatientRequests(username: string) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/patientRequest/getPatientRequests?username=${username}`
+    );
+  },
+  createPatientRequest(request: string, username: string) {
+    return axiosFetch.post(
+      `${REST_ENDPOINT}/patientRequest/createPatientRequest?requestName=${request}&username=${username}`
+    );
+  },
+  deletePatientRequest(request: string, username: string) {
+    return axiosFetch.delete(
+      `${REST_ENDPOINT}/patientRequest/deletePatientRequest?requestName=${request}&username=${username}`
     );
   },
 };
