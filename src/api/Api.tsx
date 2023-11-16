@@ -297,3 +297,25 @@ export const patientRequestApi = {
     );
   },
 };
+
+export const admissionApi = {
+  getAllAdmissions() {
+    return axiosFetch.get(`${REST_ENDPOINT}/admission/getAllAdmissions`);
+  },
+};
+
+export const medicationOrderApi = {
+  getMedicationOrderById(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/medicationOrder/getMedicationOrderById?medicationOrderId=${id}`
+    );
+  },
+};
+
+export const inpatientTreatmentApi = {
+  getInpatientTreatmentById(id: number) {
+    return axiosFetch.get(
+      `${REST_ENDPOINT}/inpatientTreatment/getInpatientTreatmentById?inpatientTreatmentId=${id}`
+    );
+  },
+};
