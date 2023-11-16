@@ -590,16 +590,16 @@ const Home = () => {
                   color: "black",
                 }}
               >
-                <span
+                 <span
+                  className="enlarge-contract"
                   style={{
-                    height: "6px",
-                    width: "6px",
+                    height: "8px",
+                    width: "8px",
                     backgroundColor: "red",
                     borderRadius: "50%",
                     display: "inline-block",
                   }}
                 ></span>
-                &nbsp; YOU ARE HERE
               </IonBadge>
             )}
           </h4>
@@ -1508,7 +1508,7 @@ const Home = () => {
                         </>
                       )}
                       {appointment.swimlaneStatusEnum === "DONE"
-                        ? showTimelineCard(appointment, "DONE", "YES", true)
+                        ? showDoneCard(appointment)
                         : null}
                     </>
                   ) : appointment.swimlaneStatusEnum === "ADMISSION" ? (
