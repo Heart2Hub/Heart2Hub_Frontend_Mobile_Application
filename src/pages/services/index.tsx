@@ -25,8 +25,8 @@ const Services: React.FC = () => {
 <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="ion-text-center" style={{ height: "80px" }}>
-            <b>My Electronic Health Record</b>
+          <IonTitle>
+            <b>Services</b>
           </IonTitle>
         </IonToolbar>
       </IonHeader>

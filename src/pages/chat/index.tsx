@@ -92,7 +92,7 @@ const ChatPage = () => {
   const [noStaffAvailable, setNoStaffAvailable] = useState(false);
 
   const connect = () => {
-    socket = io('http://localhost:4000');
+    socket = io('http://localhost:4000', { transports : ['websocket']});
     // socket.emit('newUser', socket.id);
   };
 
