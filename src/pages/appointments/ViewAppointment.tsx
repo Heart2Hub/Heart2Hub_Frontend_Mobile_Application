@@ -122,7 +122,7 @@ const ViewAppointment = () => {
     }
   };
 
-  const handleGetProfileImage = async (profilePicture: FormData) => {
+  const handleGetProfileImage = async (profilePicture: any) => {
     if (profilePicture) {
       const response = await imageServerApi.getImageFromImageServer(
         "id",
@@ -205,7 +205,7 @@ const ViewAppointment = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton></IonBackButton>
+          <IonBackButton defaultHref="/tabs/services/appointments"></IonBackButton>
           </IonButtons>
           <IonTitle>View Appointment</IonTitle>
         </IonToolbar>

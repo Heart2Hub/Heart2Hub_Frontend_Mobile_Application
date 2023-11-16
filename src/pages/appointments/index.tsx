@@ -58,6 +58,7 @@ interface Appointment {
 }
 
 interface Staff {
+  staffId: number;
   firstname: string;
   lastname: string;
   unit: {
@@ -83,34 +84,33 @@ const Appointments = () => {
     try {
       const username = localStorage.getItem("username") ?? "";
       const response = await appointmentApi.viewPatientAppointments(username);
-      const a = response.data;
 
-      console.log(a);
-
-      //get staff data
-      for (let i = 0; i < a.length; i++) {
-        try {
-          if (a[i].currentAssignedStaffId) {
-            const response2 = await staffApi.getStaffById(
-              a[i].currentAssignedStaffId
-            );
-            a[i].staffDetails = response2.data;
+      const allAppointments = response.data;
+      let temp: Appointment[] = [];
+      let tempPast: Appointment[] = [];
+      for (const appointment of allAppointments) {
+        if (appointment.swimlaneStatusEnum !== "DONE") {
+          if (temp.length === 0 || !temp.some(existing => existing.appointmentId === appointment.appointmentId)) {
+            temp.push(appointment);
           }
-        } catch (error) {
-          console.log(error);
+          setAppointments(temp);
+        } else {
+          if (tempPast.length === 0 || !tempPast.some((e) => e.appointmentId === appointment.appointmentId)) {
+            // Mapping For StaffIds
+            for (const staffId of appointment.listOfStaffsId) {
+              const staff = await staffApi.getStaffById(staffId);
+              if (!appointment.staffs) {
+                appointment.staffs = [];
+              }
+              if (!appointment.staffs.some((existingStaff: any) => existingStaff.staffId === staff.data.staffId)) {
+                appointment.staffs.push(staff.data);
+              }
+            }
+            tempPast.push(appointment);
+          }
+          setPastAppts(tempPast);
         }
-      }
-
-      //sort the appts by actual date time
-      a.sort(compareByActualDateTime);
-      const pastAppts = a.filter((appointment: Appointment) =>
-        isAppointmentPast(appointment)
-      );
-      const upcomingAppts = a.filter(
-        (appointment: Appointment) => !isAppointmentPast(appointment)
-      );
-      setAppointments(upcomingAppts);
-      setPastAppts(pastAppts);
+      } 
     } catch (error) {
       console.log(error);
     }
