@@ -984,11 +984,8 @@ const Home = () => {
                             </>
                           )}
                           {appointment.swimlaneStatusEnum === "DONE" ? 
-                            showTimelineCard(
-                              appointment,
-                              "DONE",
-                              "YES",
-                              true
+                            showDoneCard(
+                              appointment
                             ) : null
                         }
                         </>
