@@ -119,16 +119,9 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 		setToastOpen(false);
 	};
 
-	// const fetchInvoice = async () => {
-	// 	try {
-	// 		const response = await invoiceApi.findInvoice(Number(id));
-	// 		setInvoiceData(response.data);
-	// 		console.log(response.data)
-	// 		setShowTransactionModal(true);
-	// 	} catch (error) {
-	// 		console.error('Error fetching transaction details: ', error);
-	// 	}
-	// };
+	const handleCloseTransactionModal = () => {
+		setShowTransactionModal(false);
+	};
 
 	const fetchTransactionDetails = async () => {
 		try {
@@ -307,12 +300,14 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 											<IonItemDivider>Product and Services</IonItemDivider>
 											{transactionItem
 												.filter((item) => item.transactionItemPrice >= 0)
-												.map((item) => (
+												.map((item: TransactionItem) => (
 													<IonItem key={item.transactionItemId}>
 														<IonLabel>
 															<h2>{item.transactionItemName}</h2>
 															<p>
-																Quantity: {item.transactionItemQuantity} | Total Price: ${item.transactionItemPrice.toFixed(2) * item.transactionItemQuantity}
+																Quantity: {item.transactionItemQuantity} | Total Price: ${(
+																	item.transactionItemPrice * item.transactionItemQuantity
+																).toFixed(2)}
 															</p>
 														</IonLabel>
 													</IonItem>
@@ -360,7 +355,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 								/>
 							</div>
 						)}
-						{state?.invoiceStatusEnum === 'PAID' && (
+						{state?.invoiceStatusEnum === 'PAID' && transactionDetails && (
 							<IonButton expand="full" onClick={fetchTransactionDetails}>
 								View Transaction
 							</IonButton>
@@ -403,6 +398,9 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 										</IonItem>
 									)}
 								</IonList>
+								<IonButton expand="full" onClick={handleCloseTransactionModal}>
+									Close
+								</IonButton>
 							</IonContent>
 						</IonModal>
 						<IonToast
