@@ -80,6 +80,13 @@ const Subsidies: React.FC = () => {
 		}
 	};
 
+	function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+		setTimeout(() => {
+		  fetchSubsidies();
+		  event.detail.complete();
+		}, 1000);
+	  }
+
 	useEffect(() => {
 		fetchSubsidies();
 	}, []);
@@ -98,6 +105,9 @@ const Subsidies: React.FC = () => {
 				</IonToolbar>
 			</IonHeader>
 			<IonContent fullscreen>
+				<IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+					<IonRefresherContent></IonRefresherContent>
+				</IonRefresher>
 				{subsidies.length === 0 ? (
 					<div
 						style={{
