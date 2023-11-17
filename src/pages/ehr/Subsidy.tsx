@@ -100,18 +100,18 @@ const Subsidies: React.FC = () => {
 			<IonContent fullscreen>
 				{subsidies.length === 0 ? (
 					<div
-					style={{
-					  display: "flex",
-					  justifyContent: "center",
-					  alignItems: "center",
-					  height: "100vh",
-					  flexDirection: "column",
-					  backgroundColor: "#f4f4f4", // Light gray background
-					}}
-				      >
-					<FaSadTear style={{ fontSize: "3em", color: "#999" }} /> {/* Sad face icon */}
-					<h2 style={{ marginTop: "10px", color: "#555" }}>No subsidies available.</h2>
-				      </div>) : (
+						style={{
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center",
+							height: "100vh",
+							flexDirection: "column",
+							backgroundColor: "#f4f4f4", // Light gray background
+						}}
+					>
+						<FaSadTear style={{ fontSize: "3em", color: "#999" }} /> {/* Sad face icon */}
+						<h2 style={{ marginTop: "10px", color: "#555" }}>No subsidies available.</h2>
+					</div>) : (
 					<IonList>
 						{subsidies.map(subsidy => (
 							<IonItem key={subsidy.subsidyId}>

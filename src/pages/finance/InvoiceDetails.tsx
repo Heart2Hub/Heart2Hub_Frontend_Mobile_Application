@@ -43,6 +43,8 @@ import axios from 'axios';
 import React, { useEffect, useState, } from "react";
 import { Route, Redirect, useHistory, useLocation, useParams } from "react-router";
 import { invoiceApi, patientApi, transactionApi } from "../../api/Api";
+import { FaSadTear } from "react-icons/fa";
+
 
 interface Invoice {
 	invoiceId: number;
@@ -127,7 +129,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 		try {
 			const response = await transactionApi.findTransactionWithInvoice(Number(id));
 			setTransactionDetails(response.data);
-			console.log(response.data)
+			console.log(response)
 			setShowTransactionModal(true);
 		} catch (error) {
 			console.error('Error fetching transaction details: ', error);
@@ -355,7 +357,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 								/>
 							</div>
 						)}
-						{state?.invoiceStatusEnum === 'PAID' && transactionDetails && (
+						{state?.invoiceStatusEnum === 'PAID' && (
 							<IonButton expand="full" onClick={fetchTransactionDetails}>
 								View Transaction
 							</IonButton>
@@ -363,39 +365,49 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 						<IonModal isOpen={showTransactionModal} onDidDismiss={() => setShowTransactionModal(false)}>
 							<IonContent className="ion-padding">
 								<IonList lines="full">
-									{transactionDetails && (
-										<IonItem>
-											<IonLabel>
-												<h3>Transaction ID:</h3>
-												<p>{transactionDetails.transactionId}</p>
-											</IonLabel>
-										</IonItem>
-									)}
-									{transactionDetails && (
-										<IonItem>
-											<IonLabel>
-												<h3>Transaction Date:</h3>
-												<p>{formatTransactionDate(transactionDetails.transactionDate)}</p>
-											</IonLabel>
-										</IonItem>
-									)}
-									{transactionDetails && (
-										<IonItem>
-											<IonLabel>
-												<h3>Transaction Amount:</h3>
-												<p>${transactionDetails.transactionAmount.toFixed(2)}</p>
-											</IonLabel>
-										</IonItem>
-									)}
-									{transactionDetails && (
-										<IonItem>
-											<IonLabel>
-												<h3>Status:</h3>
-												<IonChip color={getChipColor(transactionDetails.approvalStatusEnum)}>
-													{transactionDetails.approvalStatusEnum}
-												</IonChip>
-											</IonLabel>
-										</IonItem>
+									{transactionDetails ? (
+										<>
+											<IonItem>
+												<IonLabel>
+													<h3>Transaction ID:</h3>
+													<p>{transactionDetails.transactionId}</p>
+												</IonLabel>
+											</IonItem>
+											<IonItem>
+												<IonLabel>
+													<h3>Transaction Date:</h3>
+													<p>{formatTransactionDate(transactionDetails.transactionDate)}</p>
+												</IonLabel>
+											</IonItem>
+											<IonItem>
+												<IonLabel>
+													<h3>Transaction Amount:</h3>
+													<p>${transactionDetails.transactionAmount.toFixed(2)}</p>
+												</IonLabel>
+											</IonItem>
+											<IonItem>
+												<IonLabel>
+													<h3>Status:</h3>
+													<IonChip color={getChipColor(transactionDetails.approvalStatusEnum)}>
+														{transactionDetails.approvalStatusEnum}
+													</IonChip>
+												</IonLabel>
+											</IonItem>
+										</>
+									) : (
+											<div
+												style={{
+													display: "flex",
+													justifyContent: "center",
+													alignItems: "center",
+													// height: "100vh",
+													flexDirection: "column",
+													backgroundColor: "#f4f4f4", // Light gray background
+												}}
+											>
+												<FaSadTear style={{ fontSize: "3em", color: "#999" }} /> {/* Sad face icon */}
+												<h2 style={{ marginTop: "10px", color: "#555" }}>Invoice was paid by Claims/Subsidies</h2>
+											</div>
 									)}
 								</IonList>
 								<IonButton expand="full" onClick={handleCloseTransactionModal}>
