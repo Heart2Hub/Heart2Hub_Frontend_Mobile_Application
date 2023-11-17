@@ -43,7 +43,7 @@ import axios from 'axios';
 import React, { useEffect, useState, } from "react";
 import { Route, Redirect, useHistory, useLocation, useParams } from "react-router";
 import { invoiceApi, patientApi, transactionApi } from "../../api/Api";
-import { FaSadTear } from "react-icons/fa";
+// import { FaSadTear } from "react-icons/fa";
 
 
 interface Invoice {
@@ -405,7 +405,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
 													backgroundColor: "#f4f4f4", // Light gray background
 												}}
 											>
-												<FaSadTear style={{ fontSize: "3em", color: "#999" }} /> {/* Sad face icon */}
+												{/* <FaSadTear style={{ fontSize: "3em", color: "#999" }} /> Sad face icon */}
 												<h2 style={{ marginTop: "10px", color: "#555" }}>Invoice was paid by Claims/Subsidies</h2>
 											</div>
 									)}
