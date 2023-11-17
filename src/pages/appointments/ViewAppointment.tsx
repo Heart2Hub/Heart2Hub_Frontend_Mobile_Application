@@ -345,11 +345,11 @@ const ViewAppointment = () => {
                         <img src={createBlobUrl(staff.image)} alt="Staff" />
                       </IonAvatar>
                       <IonLabel>
-                        <IonCardTitle>
+                        <IonCardTitle style={{ fontSize: "14px"}}>
                           {staff.firstname} {staff.lastname}
                           {" (" + staff.staffRoleEnum + ")"}
                         </IonCardTitle>
-                        <IonCardSubtitle>{staff.unit.name}</IonCardSubtitle>
+                        <IonCardSubtitle style={{ fontSize: "13px"}} >{staff.unit.name}</IonCardSubtitle>
                       </IonLabel>
                     </IonItem>
                   ))}
