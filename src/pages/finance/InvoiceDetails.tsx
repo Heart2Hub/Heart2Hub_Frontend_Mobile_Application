@@ -49,6 +49,8 @@ import {
   useParams,
 } from "react-router";
 import { invoiceApi, patientApi, transactionApi } from "../../api/Api";
+import { FaSadTear } from "react-icons/fa";
+
 import { REST_ENDPOINT } from "../../constants/RestEndPoint";
 
 interface Invoice {
@@ -127,16 +129,9 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
     setToastOpen(false);
   };
 
-  // const fetchInvoice = async () => {
-  // 	try {
-  // 		const response = await invoiceApi.findInvoice(Number(id));
-  // 		setInvoiceData(response.data);
-  // 		console.log(response.data)
-  // 		setShowTransactionModal(true);
-  // 	} catch (error) {
-  // 		console.error('Error fetching transaction details: ', error);
-  // 	}
-  // };
+  const handleCloseTransactionModal = () => {
+    setShowTransactionModal(false);
+  };
 
   const fetchTransactionDetails = async () => {
     try {
@@ -144,7 +139,7 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
         Number(id)
       );
       setTransactionDetails(response.data);
-      console.log(response.data);
+      console.log(response);
       setShowTransactionModal(true);
     } catch (error) {
       console.error("Error fetching transaction details: ", error);
@@ -343,15 +338,17 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
                       <IonItemDivider>Product and Services</IonItemDivider>
                       {transactionItem
                         .filter((item) => item.transactionItemPrice >= 0)
-                        .map((item) => (
+                        .map((item: TransactionItem) => (
                           <IonItem key={item.transactionItemId}>
                             <IonLabel>
                               <h2>{item.transactionItemName}</h2>
                               <p>
                                 Quantity: {item.transactionItemQuantity} | Total
                                 Price: $
-                                {item.transactionItemPrice.toFixed(2) *
-                                  item.transactionItemQuantity}
+                                {(
+                                  item.transactionItemPrice *
+                                  item.transactionItemQuantity
+                                ).toFixed(2)}
                               </p>
                             </IonLabel>
                           </IonItem>
@@ -424,51 +421,67 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
             >
               <IonContent className="ion-padding">
                 <IonList lines="full">
-                  {transactionDetails && (
-                    <IonItem>
-                      <IonLabel>
-                        <h3>Transaction ID:</h3>
-                        <p>{transactionDetails.transactionId}</p>
-                      </IonLabel>
-                    </IonItem>
-                  )}
-                  {transactionDetails && (
-                    <IonItem>
-                      <IonLabel>
-                        <h3>Transaction Date:</h3>
-                        <p>
-                          {formatTransactionDate(
-                            transactionDetails.transactionDate
-                          )}
-                        </p>
-                      </IonLabel>
-                    </IonItem>
-                  )}
-                  {transactionDetails && (
-                    <IonItem>
-                      <IonLabel>
-                        <h3>Transaction Amount:</h3>
-                        <p>
-                          ${transactionDetails.transactionAmount.toFixed(2)}
-                        </p>
-                      </IonLabel>
-                    </IonItem>
-                  )}
-                  {transactionDetails && (
-                    <IonItem>
-                      <IonLabel>
-                        <h3>Status:</h3>
-                        <IonChip
-                          color={getChipColor(
-                            transactionDetails.approvalStatusEnum
-                          )}
-                        >
-                          {transactionDetails.approvalStatusEnum}
-                        </IonChip>
-                      </IonLabel>
-                    </IonItem>
+                  {transactionDetails ? (
+                    <>
+                      <IonItem>
+                        <IonLabel>
+                          <h3>Transaction ID:</h3>
+                          <p>{transactionDetails.transactionId}</p>
+                        </IonLabel>
+                      </IonItem>
+                      <IonItem>
+                        <IonLabel>
+                          <h3>Transaction Date:</h3>
+                          <p>
+                            {formatTransactionDate(
+                              transactionDetails.transactionDate
+                            )}
+                          </p>
+                        </IonLabel>
+                      </IonItem>
+                      <IonItem>
+                        <IonLabel>
+                          <h3>Transaction Amount:</h3>
+                          <p>
+                            ${transactionDetails.transactionAmount.toFixed(2)}
+                          </p>
+                        </IonLabel>
+                      </IonItem>
+                      <IonItem>
+                        <IonLabel>
+                          <h3>Status:</h3>
+                          <IonChip
+                            color={getChipColor(
+                              transactionDetails.approvalStatusEnum
+                            )}
+                          >
+                            {transactionDetails.approvalStatusEnum}
+                          </IonChip>
+                        </IonLabel>
+                      </IonItem>
+                    </>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        // height: "100vh",
+                        flexDirection: "column",
+                        backgroundColor: "#f4f4f4", // Light gray background
+                      }}
+                    >
+                      <FaSadTear style={{ fontSize: "3em", color: "#999" }} />{" "}
+                      {/* Sad face icon */}
+                      <h2 style={{ marginTop: "10px", color: "#555" }}>
+                        Invoice was paid by Claims/Subsidies
+                      </h2>
+                    </div>
                   )}
                 </IonList>
+                <IonButton expand="full" onClick={handleCloseTransactionModal}>
+                  Close
+                </IonButton>
               </IonContent>
             </IonModal>
             <IonToast

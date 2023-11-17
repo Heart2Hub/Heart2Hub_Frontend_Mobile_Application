@@ -200,6 +200,15 @@ const Finance: React.FC = () => {
     );
   };
 
+  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+		setTimeout(() => {
+			if (patient) {
+				fetchInvoices(patient.username);
+			}
+		  event.detail.complete();
+		}, 1000);
+	  }
+
   useEffect(() => {
     getPatientDetails();
   }, []);
@@ -221,6 +230,9 @@ const Finance: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+					<IonRefresherContent></IonRefresherContent>
+				</IonRefresher>
         <IonToolbar>
           <IonSegment value={sortBy} onIonChange={(e) => setSortBy(e.detail.value as "earliest" | "latest")}>
             <IonSegmentButton value="latest">
@@ -234,6 +246,7 @@ const Finance: React.FC = () => {
             value={statusFilter}
             placeholder="Select Status"
             onIonChange={(e) => setStatusFilter(e.detail.value)}
+            style={{ paddingLeft: '15px'}}
           >
             <IonSelectOption value={null}>All</IonSelectOption>
             <IonSelectOption value="UNPAID">Unpaid</IonSelectOption>

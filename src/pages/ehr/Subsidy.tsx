@@ -39,6 +39,7 @@ import { timerOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { Route, Redirect, useHistory, useLocation } from "react-router";
 import { invoiceApi, patientApi, transactionApi, subsidyApi } from "../../api/Api";
+import { FaSadTear } from "react-icons/fa";
 
 interface Subsidy {
 	subsidyId: number;
@@ -79,6 +80,13 @@ const Subsidies: React.FC = () => {
 		}
 	};
 
+	function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+		setTimeout(() => {
+		  fetchSubsidies();
+		  event.detail.complete();
+		}, 1000);
+	  }
+
 	useEffect(() => {
 		fetchSubsidies();
 	}, []);
@@ -97,6 +105,9 @@ const Subsidies: React.FC = () => {
 				</IonToolbar>
 			</IonHeader>
 			<IonContent fullscreen>
+				<IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+					<IonRefresherContent></IonRefresherContent>
+				</IonRefresher>
 				{subsidies.length === 0 ? (
 					<div
 						style={{
@@ -105,9 +116,11 @@ const Subsidies: React.FC = () => {
 							alignItems: "center",
 							height: "100vh",
 							flexDirection: "column",
+							backgroundColor: "#f4f4f4", // Light gray background
 						}}
 					>
-						<h2>No subsidies available for this user.</h2>
+						<FaSadTear style={{ fontSize: "3em", color: "#999" }} /> {/* Sad face icon */}
+						<h2 style={{ marginTop: "10px", color: "#555" }}>No subsidies available.</h2>
 					</div>) : (
 					<IonList>
 						{subsidies.map(subsidy => (
