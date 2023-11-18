@@ -49,7 +49,6 @@ import {
   useParams,
 } from "react-router";
 import { invoiceApi, patientApi, transactionApi } from "../../api/Api";
-// import { FaSadTear } from "react-icons/fa";
 
 import { REST_ENDPOINT } from "../../constants/RestEndPoint";
 
@@ -471,7 +470,6 @@ const InvoiceDetails: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
                         backgroundColor: "#f4f4f4", // Light gray background
                       }}
                     >
-                      <FaSadTear style={{ fontSize: "3em", color: "#999" }} />{" "}
                       {/* Sad face icon */}
                       <h2 style={{ marginTop: "10px", color: "#555" }}>
                         Invoice was paid by Claims/Subsidies
