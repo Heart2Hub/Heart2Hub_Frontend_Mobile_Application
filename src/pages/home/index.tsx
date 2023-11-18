@@ -75,6 +75,9 @@ type Staff = {
   staffRoleEnum: string;
   location: string;
   name: string;
+  unit: {
+    listOfFacilities: Facility[]
+  }
 };
 
 interface Appointment {
@@ -90,6 +93,10 @@ interface Appointment {
   dispensaryStatusEnum: string;
 }
 
+interface Facility {
+  location: string;
+  name: string;
+}
 interface Order {
   medications: string[];
   treatment: string;
@@ -274,15 +281,13 @@ const Home = () => {
         contentStyle={{ background: getColor(swimlane), color: "#fff" }}
         contentArrowStyle={{ borderRight: `7px solid  ${getColor(swimlane)}` }}
         date={
+          (swimlane === "DISCHARGE") ? "" :
           (swimlane === "PHARMACY" &&
             getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum !==
               "PHARMACIST") ||
           (swimlane === "REGISTRATION" &&
             getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum !==
-              "ADMIN") ||
-          (swimlane === "DISCHARGE" &&
-            getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum !==
-              "ADMIN")
+              "ADMIN") 
             ? "Staff: Unassigned"
             : `Staff: ${
                 getStaff(appointment.listOfStaffsId, swimlane)?.staffRoleEnum
@@ -290,6 +295,7 @@ const Home = () => {
               getStaff(appointment.listOfStaffsId, swimlane)?.firstname +
               " " +
               getStaff(appointment.listOfStaffsId, swimlane)?.lastname
+          
         }
         iconStyle={{ background: getColor(swimlane), color: "#fff" }}
       >
@@ -324,11 +330,16 @@ const Home = () => {
             </>
           )}
           <b>Location:</b>{" "}
-          {swimlane !== "PHARMACY"
+          {appointment.listOfStaffsId.length === 0 ? "TBC" 
+            : swimlane !== "PHARMACY"
             ? getStaff(appointment.listOfStaffsId, swimlane)?.location +
               " " +
               getStaff(appointment.listOfStaffsId, swimlane)?.name
-            : "Level 1 Entrance"}
+            : appointment.dispensaryStatusEnum === "PREPARING" && appointment.currentAssignedStaffId === null ? 
+              "Level 2" 
+              : getStaff(appointment.listOfStaffsId, swimlane)?.unit.listOfFacilities[0].location + 
+              " " + 
+              getStaff(appointment.listOfStaffsId, swimlane)?.unit.listOfFacilities[0].name}
           <br />
           <b>Arrived:</b>{" "}
           <IonBadge
@@ -1230,7 +1241,7 @@ const Home = () => {
                   ) : appointment.swimlaneStatusEnum === "PHARMACY" ? (
                     <>
                       {/* // Consultation -> Pharmacy */}
-                      {appointment.listOfStaffsId.length === 3 ? (
+                      {appointment.listOfStaffsId.length === 3 || (appointment.listOfStaffsId.length === 4 && appointment.currentAssignedStaffId != null)? (
                         <>
                           {showTimelineCard(
                             appointment,
@@ -1338,7 +1349,7 @@ const Home = () => {
                             appointment,
                             "DISCHARGE",
                             appointment.arrived ? "Yes" : "No",
-                            true
+                            appointment.swimlaneStatusEnum === "DISCHARGE"
                           )}
                         </>
                       ) : // Consultation -> Admission -> Discharge
@@ -1373,7 +1384,7 @@ const Home = () => {
                             appointment,
                             "DISCHARGE",
                             appointment.arrived ? "Yes" : "No",
-                            true
+                            appointment.swimlaneStatusEnum === "DISCHARGE"
                           )}
                         </>
                       ) : // Consultation -> Pharmacy -> Discharge
@@ -1411,7 +1422,7 @@ const Home = () => {
                             appointment,
                             "DISCHARGE",
                             appointment.arrived ? "Yes" : "No",
-                            true
+                            appointment.swimlaneStatusEnum === "DISCHARGE"
                           )}
                         </>
                       ) : // Consultation -> Treatment -> Consultation -> Pharmacy -> Discharge
@@ -1461,7 +1472,7 @@ const Home = () => {
                             appointment,
                             "DISCHARGE",
                             appointment.arrived ? "Yes" : "No",
-                            true
+                            appointment.swimlaneStatusEnum === "DISCHARGE"
                           )}
                         </>
                       ) : (
@@ -1477,7 +1488,7 @@ const Home = () => {
                             appointment,
                             "DISCHARGE",
                             appointment.arrived ? "Yes" : "No",
-                            true
+                            appointment.swimlaneStatusEnum === "DISCHARGE"
                           )}
                         </>
                       )}
