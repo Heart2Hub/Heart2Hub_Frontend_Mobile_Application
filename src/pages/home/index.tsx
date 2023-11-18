@@ -24,6 +24,7 @@ import {
   IonRow,
   IonCol,
   IonText,
+  IonToast,
 } from "@ionic/react";
 import {
   patientApi,
@@ -55,7 +56,7 @@ import showerIcon from "../../assets/shower-solid.svg";
 import waterIcon from "../../assets/glass-water-solid.svg";
 import toiletIcon from "../../assets/toilet-solid.svg";
 import moment, { Moment } from "moment";
-import './index.css'
+import "./index.css";
 
 type Patient = {
   patientId: number;
@@ -297,21 +298,25 @@ const Home = () => {
           className="vertical-timeline-element-title"
           style={{ display: "flex", justifyContent: "space-between" }}
         >
-          <b>{here && (
-            <>
-            <span
-            className="enlarge-contract"
-            style={{
-              height: "8px",
-              width: "8px",
-              marginBottom: "2px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-              display: "inline-block",
-            }}
-          ></span>&nbsp;&nbsp;
-          </>
-          )}{swimlane}</b>
+          <b>
+            {here && (
+              <>
+                <span
+                  className="enlarge-contract"
+                  style={{
+                    height: "8px",
+                    width: "8px",
+                    marginBottom: "2px",
+                    backgroundColor: "red",
+                    borderRadius: "50%",
+                    display: "inline-block",
+                  }}
+                ></span>
+                &nbsp;&nbsp;
+              </>
+            )}
+            {swimlane}
+          </b>
         </h5>
         <h6 className="vertical-timeline-element-subtitle">
           {appointment.departmentName}
@@ -383,19 +388,21 @@ const Home = () => {
         >
           <b>
             <>
-            <span
-            className="enlarge-contract"
-            style={{
-              height: "8px",
-              width: "8px",
-              marginBottom: "2px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-              display: "inline-block",
-            }}
-          ></span>&nbsp;&nbsp;
-          </>
-          DONE</b>
+              <span
+                className="enlarge-contract"
+                style={{
+                  height: "8px",
+                  width: "8px",
+                  marginBottom: "2px",
+                  backgroundColor: "red",
+                  borderRadius: "50%",
+                  display: "inline-block",
+                }}
+              ></span>
+              &nbsp;&nbsp;
+            </>
+            DONE
+          </b>
         </h4>
         <h6 className="vertical-timeline-element-subtitle">
           {appointment.departmentName}
@@ -489,7 +496,7 @@ const Home = () => {
           );
           timelineEventMoments.sort((a, b) => (a.isBefore(b) ? -1 : 1));
 
-          console.log(timelineEventMoments);
+          //console.log(timelineEventMoments);
           setOrders(timelineEventMoments);
         } else {
           setCurrAdmission(null);
@@ -571,33 +578,30 @@ const Home = () => {
           }
           iconStyle={{ background: getColor("REGISTRATION"), color: "#fff" }}
         >
-          <h4
+          <h5
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>REGISTRATION</b>
-            {!admission.arrived && (
-              <IonBadge
-                style={{
-                  paddingTop: 8,
-                  fontSize: "9px",
-                  backgroundColor: "yellow",
-                  color: "black",
-                }}
-              >
-                 <span
-                  className="enlarge-contract"
-                  style={{
-                    height: "8px",
-                    width: "8px",
-                    backgroundColor: "red",
-                    borderRadius: "50%",
-                    display: "inline-block",
-                  }}
-                ></span>
-              </IonBadge>
-            )}
-          </h4>
+            <b>
+              {!admission.arrived && (
+                <>
+                  <span
+                    className="enlarge-contract"
+                    style={{
+                      height: "8px",
+                      width: "8px",
+                      marginBottom: "2px",
+                      backgroundColor: "red",
+                      borderRadius: "50%",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  &nbsp;&nbsp;
+                </>
+              )}
+              REGISTRATION
+            </b>
+          </h5>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
           </h6>
@@ -661,26 +665,30 @@ const Home = () => {
           }
           iconStyle={{ background: getColor("TRIAGE"), color: "#fff" }}
         >
-          <h4
+          <h5
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>{here && (
-            <>
-            <span
-            className="enlarge-contract"
-            style={{
-              height: "8px",
-              width: "8px",
-              marginBottom: "2px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-              display: "inline-block",
-            }}
-          ></span>&nbsp;&nbsp;
-          </>
-          )}MEDICATION</b>
-          </h4>
+            <b>
+              {here && (
+                <>
+                  <span
+                    className="enlarge-contract"
+                    style={{
+                      height: "8px",
+                      width: "8px",
+                      marginBottom: "2px",
+                      backgroundColor: "red",
+                      borderRadius: "50%",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  &nbsp;&nbsp;
+                </>
+              )}
+              MEDICATION
+            </b>
+          </h5>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
           </h6>
@@ -688,7 +696,7 @@ const Home = () => {
             <b>Date/Time:</b> {startDate.format("DD/MM/YYYY HH:mmA")}
             <br />
             {medicationOrders.map((medicationOrder: any, index) => {
-              console.log(medicationOrder);
+              //console.log(medicationOrder);
               return (
                 <>
                   <b>Medication {index + 1}:</b>{" "}
@@ -741,26 +749,30 @@ const Home = () => {
           date={`Staff: ${staffRole} ${staffName}`}
           iconStyle={{ background: getColor("CONSULTATION"), color: "#fff" }}
         >
-          <h4
+          <h5
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>{here && (
-            <>
-            <span
-            className="enlarge-contract"
-            style={{
-              height: "8px",
-              width: "8px",
-              marginBottom: "2px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-              display: "inline-block",
-            }}
-          ></span>&nbsp;&nbsp;
-          </>
-          )}TREATMENT</b>
-          </h4>
+            <b>
+              {here && (
+                <>
+                  <span
+                    className="enlarge-contract"
+                    style={{
+                      height: "8px",
+                      width: "8px",
+                      marginBottom: "2px",
+                      backgroundColor: "red",
+                      borderRadius: "50%",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  &nbsp;&nbsp;
+                </>
+              )}
+              TREATMENT
+            </b>
+          </h5>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
           </h6>
@@ -821,26 +833,30 @@ const Home = () => {
           date={""}
           iconStyle={{ background: getColor("DONE"), color: "#fff" }}
         >
-          <h4
+          <h5
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>{here && (
-            <>
-            <span
-            className="enlarge-contract"
-            style={{
-              height: "8px",
-              width: "8px",
-              marginBottom: "2px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-              display: "inline-block",
-            }}
-          ></span>&nbsp;&nbsp;
-          </>
-          )}DISCHARGE</b>
-          </h4>
+            <b>
+              {here && (
+                <>
+                  <span
+                    className="enlarge-contract"
+                    style={{
+                      height: "8px",
+                      width: "8px",
+                      marginBottom: "2px",
+                      backgroundColor: "red",
+                      borderRadius: "50%",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  &nbsp;&nbsp;
+                </>
+              )}
+              DISCHARGE
+            </b>
+          </h5>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
           </h6>
@@ -999,12 +1015,17 @@ const Home = () => {
     setSelectedCards(updatedSelectedCards);
   };
 
+  const [createRequest, setCreateRequest] = useState(false);
+  const [deleteRequest, setDeleteRequest] = useState(false);
+
   const onClickRequest = async (request: string) => {
     if (selectedCards[request]) {
       await patientRequestApi.deletePatientRequest(request, storedUsername);
+      setDeleteRequest(true);
       setRequestCount((requestCount) => requestCount - 1);
     } else {
       await patientRequestApi.createPatientRequest(request, storedUsername);
+      setCreateRequest(true);
       setRequestCount((requestCount) => requestCount + 1);
     }
 
@@ -1075,13 +1096,19 @@ const Home = () => {
                 </IonToolbar>
               </IonHeader>
               <IonContent className="ion-padding">
-                <IonText>
-                  <h4>
-                    {requestCount === 0
-                      ? "You currently have 0 request! Click the cards below to make a request."
-                      : `You currently have ${requestCount} requests! A nurse will attend to you shortly.`}
-                  </h4>
-                </IonText>
+                <div
+                  style={{
+                    padding: "12px",
+                    fontSize: "18px",
+                    textAlign: "justify",
+                  }}
+                >
+                  <b>
+                    Click on the cards below to make a request! Click on a
+                    selected card again to cancel that request.
+                  </b>
+                </div>
+
                 <IonRow>
                   <IonCol size="4">
                     <IonCard
@@ -1129,6 +1156,40 @@ const Home = () => {
                     </IonCard>
                   </IonCol>
                 </IonRow>
+                <div
+                  style={{
+                    padding: "12px",
+                    fontSize: "20px",
+                    textAlign: "center",
+                  }}
+                >
+                  {requestCount === 0 ? (
+                    <p>
+                      You currently have <b>0</b> request.
+                    </p>
+                  ) : (
+                    <>
+                      <p>
+                        You currently have <b>{requestCount}</b> request(s).
+                      </p>
+                      <p>A nurse will attend to you shortly!</p>
+                    </>
+                  )}
+                </div>
+                <IonToast
+                  isOpen={createRequest}
+                  color="success"
+                  message="You added a new request"
+                  onDidDismiss={() => setCreateRequest(false)}
+                  duration={3000}
+                ></IonToast>
+                <IonToast
+                  isOpen={deleteRequest}
+                  color="warning"
+                  message="You cancelled an ongoing request"
+                  onDidDismiss={() => setDeleteRequest(false)}
+                  duration={3000}
+                ></IonToast>
               </IonContent>
             </IonModal>
           </>
