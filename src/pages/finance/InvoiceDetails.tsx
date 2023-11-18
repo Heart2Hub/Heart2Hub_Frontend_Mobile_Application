@@ -49,7 +49,7 @@ import {
   useParams,
 } from "react-router";
 import { invoiceApi, patientApi, transactionApi } from "../../api/Api";
-import { FaSadTear } from "react-icons/fa";
+// import { FaSadTear } from "react-icons/fa";
 
 import { REST_ENDPOINT } from "../../constants/RestEndPoint";
 
