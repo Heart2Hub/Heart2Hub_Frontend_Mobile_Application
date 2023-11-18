@@ -55,6 +55,7 @@ import showerIcon from "../../assets/shower-solid.svg";
 import waterIcon from "../../assets/glass-water-solid.svg";
 import toiletIcon from "../../assets/toilet-solid.svg";
 import moment, { Moment } from "moment";
+import './index.css'
 
 type Patient = {
   patientId: number;
@@ -292,33 +293,26 @@ const Home = () => {
         }
         iconStyle={{ background: getColor(swimlane), color: "#fff" }}
       >
-        <h4
+        <h5
           className="vertical-timeline-element-title"
           style={{ display: "flex", justifyContent: "space-between" }}
         >
-          <b>{swimlane}</b>
-          {here && (
-            <IonBadge
-              style={{
-                paddingTop: 8,
-                fontSize: "9px",
-                backgroundColor: "yellow",
-                color: "black",
-              }}
-            >
-              <span
-                style={{
-                  height: "6px",
-                  width: "6px",
-                  backgroundColor: "red",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                }}
-              ></span>
-              &nbsp; YOU ARE HERE
-            </IonBadge>
-          )}
-        </h4>
+          <b>{here && (
+            <>
+            <span
+            className="enlarge-contract"
+            style={{
+              height: "8px",
+              width: "8px",
+              marginBottom: "2px",
+              backgroundColor: "red",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          ></span>&nbsp;&nbsp;
+          </>
+          )}{swimlane}</b>
+        </h5>
         <h6 className="vertical-timeline-element-subtitle">
           {appointment.departmentName}
         </h6>
@@ -387,26 +381,21 @@ const Home = () => {
           className="vertical-timeline-element-title"
           style={{ display: "flex", justifyContent: "space-between" }}
         >
-          <b>DONE</b>
-          <IonBadge
-            style={{
-              paddingTop: 8,
-              fontSize: "9px",
-              backgroundColor: "yellow",
-              color: "black",
-            }}
-          >
+          <b>
+            <>
             <span
-              style={{
-                height: "6px",
-                width: "6px",
-                backgroundColor: "red",
-                borderRadius: "50%",
-                display: "inline-block",
-              }}
-            ></span>
-            &nbsp; YOU ARE HERE
-          </IonBadge>
+            className="enlarge-contract"
+            style={{
+              height: "8px",
+              width: "8px",
+              marginBottom: "2px",
+              backgroundColor: "red",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          ></span>&nbsp;&nbsp;
+          </>
+          DONE</b>
         </h4>
         <h6 className="vertical-timeline-element-subtitle">
           {appointment.departmentName}
@@ -596,16 +585,16 @@ const Home = () => {
                   color: "black",
                 }}
               >
-                <span
+                 <span
+                  className="enlarge-contract"
                   style={{
-                    height: "6px",
-                    width: "6px",
+                    height: "8px",
+                    width: "8px",
                     backgroundColor: "red",
                     borderRadius: "50%",
                     display: "inline-block",
                   }}
                 ></span>
-                &nbsp; YOU ARE HERE
               </IonBadge>
             )}
           </h4>
@@ -676,28 +665,21 @@ const Home = () => {
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>MEDICATION</b>
-            {here && (
-              <IonBadge
-                style={{
-                  paddingTop: 8,
-                  fontSize: "9px",
-                  backgroundColor: "yellow",
-                  color: "black",
-                }}
-              >
-                <span
-                  style={{
-                    height: "6px",
-                    width: "6px",
-                    backgroundColor: "red",
-                    borderRadius: "50%",
-                    display: "inline-block",
-                  }}
-                ></span>
-                &nbsp; YOU ARE HERE
-              </IonBadge>
-            )}
+            <b>{here && (
+            <>
+            <span
+            className="enlarge-contract"
+            style={{
+              height: "8px",
+              width: "8px",
+              marginBottom: "2px",
+              backgroundColor: "red",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          ></span>&nbsp;&nbsp;
+          </>
+          )}MEDICATION</b>
           </h4>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
@@ -763,28 +745,21 @@ const Home = () => {
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>TREATMENT</b>
-            {here && (
-              <IonBadge
-                style={{
-                  paddingTop: 8,
-                  fontSize: "9px",
-                  backgroundColor: "yellow",
-                  color: "black",
-                }}
-              >
-                <span
-                  style={{
-                    height: "6px",
-                    width: "6px",
-                    backgroundColor: "red",
-                    borderRadius: "50%",
-                    display: "inline-block",
-                  }}
-                ></span>
-                &nbsp; YOU ARE HERE
-              </IonBadge>
-            )}
+            <b>{here && (
+            <>
+            <span
+            className="enlarge-contract"
+            style={{
+              height: "8px",
+              width: "8px",
+              marginBottom: "2px",
+              backgroundColor: "red",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          ></span>&nbsp;&nbsp;
+          </>
+          )}TREATMENT</b>
           </h4>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
@@ -850,28 +825,21 @@ const Home = () => {
             className="vertical-timeline-element-title"
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <b>DISCHARGE</b>
-            {here && (
-              <IonBadge
-                style={{
-                  paddingTop: 8,
-                  fontSize: "9px",
-                  backgroundColor: "yellow",
-                  color: "black",
-                }}
-              >
-                <span
-                  style={{
-                    height: "6px",
-                    width: "6px",
-                    backgroundColor: "red",
-                    borderRadius: "50%",
-                    display: "inline-block",
-                  }}
-                ></span>
-                &nbsp; YOU ARE HERE
-              </IonBadge>
-            )}
+            <b>{here && (
+            <>
+            <span
+            className="enlarge-contract"
+            style={{
+              height: "8px",
+              width: "8px",
+              marginBottom: "2px",
+              backgroundColor: "red",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          ></span>&nbsp;&nbsp;
+          </>
+          )}DISCHARGE</b>
           </h4>
           <h6 className="vertical-timeline-element-subtitle">
             {`Ward ${admission.ward}`}
@@ -1514,7 +1482,7 @@ const Home = () => {
                         </>
                       )}
                       {appointment.swimlaneStatusEnum === "DONE"
-                        ? showTimelineCard(appointment, "DONE", "YES", true)
+                        ? showDoneCard(appointment)
                         : null}
                     </>
                   ) : appointment.swimlaneStatusEnum === "ADMISSION" ? (

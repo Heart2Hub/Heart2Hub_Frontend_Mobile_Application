@@ -54,8 +54,8 @@ const EHR: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="ion-text-center" style={{ height: "80px" }}>
-            <b>My Electronic Health Record</b>
+          <IonTitle>
+            <b>My EHR</b>
           </IonTitle>
         </IonToolbar>
       </IonHeader>
