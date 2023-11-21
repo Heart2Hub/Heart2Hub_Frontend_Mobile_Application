@@ -76,7 +76,7 @@ interface Appointment {
   message: string;
   arrived: boolean;
   staffDetails: Staff;
-  listOfStaffsId: number[]
+  listOfStaffsId: number[];
 }
 
 interface TimeSlotMap {
@@ -513,7 +513,7 @@ const EditSelectDateTime = () => {
             {
               text: "Ok",
               handler: () => {
-                history.push("/tabs/appointments", { message: "" });
+                history.push("/tabs/services/appointments", { message: "" });
                 setConfirm(false);
                 setSelectedDate(dayjs().toISOString());
               },

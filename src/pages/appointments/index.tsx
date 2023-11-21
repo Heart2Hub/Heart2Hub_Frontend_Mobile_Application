@@ -30,6 +30,8 @@ import {
   RefresherEventDetail,
   IonSegment,
   IonSegmentButton,
+  IonBackButton,
+  IonButtons,
 } from "@ionic/react";
 import { timerOutline } from "ionicons/icons";
 import { Route, Redirect, useHistory, useLocation } from "react-router";
@@ -47,13 +49,16 @@ interface Appointment {
   description: string;
   comments: string;
   bookedDateTime: string[];
+  actualDateTime: string[];
   departmentName: string;
   currentAssignedStaffId: number;
   arrived: boolean;
   staffDetails: Staff;
+  swimlaneStatusEnum: string;
 }
 
 interface Staff {
+  staffId: number;
   firstname: string;
   lastname: string;
   unit: {
@@ -72,35 +77,40 @@ const Appointments = () => {
   );
 
   const handleClick = () => {
-    history.push("/tabs/appointments/select-department");
+    history.push("/tabs/services/appointments/select-department");
   };
 
   const getAllAppointments = async () => {
     try {
       const username = localStorage.getItem("username") ?? "";
       const response = await appointmentApi.viewPatientAppointments(username);
-      const a = response.data;
-      for (let i = 0; i < a.length; i++) {
-        try {
-          if (a[i].currentAssignedStaffId) {
-            const response2 = await staffApi.getStaffById(
-              a[i].currentAssignedStaffId
-            );
-            a[i].staffDetails = response2.data;
+
+      const allAppointments = response.data;
+      let temp: Appointment[] = [];
+      let tempPast: Appointment[] = [];
+      for (const appointment of allAppointments) {
+        if (appointment.swimlaneStatusEnum !== "DONE") {
+          if (temp.length === 0 || !temp.some(existing => existing.appointmentId === appointment.appointmentId)) {
+            temp.push(appointment);
           }
-        } catch (error) {
-          console.log(error);
+          setAppointments(temp);
+        } else {
+          if (tempPast.length === 0 || !tempPast.some((e) => e.appointmentId === appointment.appointmentId)) {
+            // Mapping For StaffIds
+            for (const staffId of appointment.listOfStaffsId) {
+              const staff = await staffApi.getStaffById(staffId);
+              if (!appointment.staffs) {
+                appointment.staffs = [];
+              }
+              if (!appointment.staffs.some((existingStaff: any) => existingStaff.staffId === staff.data.staffId)) {
+                appointment.staffs.push(staff.data);
+              }
+            }
+            tempPast.push(appointment);
+          }
+          setPastAppts(tempPast);
         }
-      }
-      a.sort(compareByActualDateTime);
-      const pastAppts = a.filter((appointment: Appointment) =>
-        isAppointmentPast(appointment)
-      );
-      const upcomingAppts = a.filter(
-        (appointment: Appointment) => !isAppointmentPast(appointment)
-      );
-      setAppointments(upcomingAppts);
-      setPastAppts(pastAppts);
+      } 
     } catch (error) {
       console.log(error);
     }
@@ -152,14 +162,18 @@ const Appointments = () => {
   }
 
   const handleClickAppt = (appointment: Appointment) => {
-    history.push(`/tabs/appointments/view/${appointment?.appointmentId}`, {
-      appointmentId: appointment?.appointmentId,
-      description: appointment?.description,
-      bookedDateTime: appointment?.bookedDateTime,
-      staffDetails: appointment.staffDetails ? appointment.staffDetails : "",
-      department: appointment.departmentName,
-      arrived: appointment.arrived,
-    });
+    history.push(
+      `/tabs/services/appointments/view/${appointment?.appointmentId}`,
+      {
+        appointmentId: appointment?.appointmentId,
+        description: appointment?.description,
+        bookedDateTime: appointment?.bookedDateTime,
+        staffDetails: appointment.staffDetails ? appointment.staffDetails : "",
+        department: appointment.departmentName,
+        arrived: appointment.arrived,
+        swimlaneStatusEnum: appointment.swimlaneStatusEnum,
+      }
+    );
   };
 
   function compareByActualDateTime(a: Appointment, b: Appointment): number {
@@ -191,20 +205,21 @@ const Appointments = () => {
   }
 
   const isAppointmentPast = (appointment: Appointment) => {
-    const dt = appointment.bookedDateTime;
-    const [year, month, day, hour, minute] = dt.map(Number);
+    return appointment.swimlaneStatusEnum == "DONE";
+    // const dt = appointment.bookedDateTime;
+    // const [year, month, day, hour, minute] = dt.map(Number);
 
-    const targetDate = dayjs()
-      .set("year", year)
-      .set("month", month - 1)
-      .set("day", day - 1)
-      .set("hour", hour)
-      .set("minute", minute);
-    const currentDate = dayjs();
-    if (currentDate.isAfter(targetDate)) {
-      return true;
-    }
-    return false;
+    // const targetDate = dayjs()
+    //   .set("year", year)
+    //   .set("month", month - 1)
+    //   .set("day", day - 1)
+    //   .set("hour", hour)
+    //   .set("minute", minute);
+    // const currentDate = dayjs();
+    // if (currentDate.isAfter(targetDate)) {
+    //   return true;
+    // }
+    // return false;
   };
 
   const handleSegmentChange = (event: CustomEvent) => {
@@ -220,7 +235,10 @@ const Appointments = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="ion-text-center" style={{ height: "80px" }}>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/tabs/services"></IonBackButton>
+          </IonButtons>
+          <IonTitle>
             <b>My Appointments</b>
           </IonTitle>
         </IonToolbar>
@@ -284,27 +302,49 @@ const Appointments = () => {
           </>
         ) : (
           <>
-            {/* {pastAppts.map((appointment) => 
-            <IonCard onClick={() => handleClickAppt(appointment)} key={appointment.appointmentId}>
-            <IonCardHeader>
-              {appointment.staffDetails ? 
-              <IonCardTitle style={{ fontSize: "20px"}}>Appointment with <br/>Dr. {appointment.staffDetails.firstname + " " + appointment.staffDetails.lastname}</IonCardTitle> :
-              <IonCardTitle style={{ fontSize: "20px"}}>Appointment</IonCardTitle>}
-            </IonCardHeader>
-            <IonCardContent>
-            <IonText style={{ fontSize: "16px"}}>{appointment.departmentName}</IonText>
-              <IonList> 
-                <IonItem>
-                  <IonIcon slot="start" icon={timerOutline} />
-                  <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[0] + ' ' + getDateTime(appointment.actualDateTime).split(" ")[1]}</IonLabel>
-                </IonItem>
-                <IonItem>
-                <IonIcon slot="start" />
-                  <IonLabel>{getDateTime(appointment.actualDateTime).split(" ")[2]}</IonLabel>
-                </IonItem>
-              </IonList>
-            </IonCardContent>
-          </IonCard>)} */}
+            {pastAppts.map((appointment) => (
+              <IonCard
+                onClick={() => handleClickAppt(appointment)}
+                key={appointment.appointmentId}
+              >
+                <IonCardHeader>
+                  {appointment.staffDetails ? (
+                    <IonCardTitle style={{ fontSize: "20px" }}>
+                      Appointment with <br />
+                      Dr.{" "}
+                      {appointment.staffDetails.firstname +
+                        " " +
+                        appointment.staffDetails.lastname}
+                    </IonCardTitle>
+                  ) : (
+                    <IonCardTitle style={{ fontSize: "20px" }}>
+                      Appointment
+                    </IonCardTitle>
+                  )}
+                </IonCardHeader>
+                <IonCardContent>
+                  <IonText style={{ fontSize: "16px" }}>
+                    {appointment.departmentName}
+                  </IonText>
+                  <IonList>
+                    <IonItem>
+                      <IonIcon slot="start" icon={timerOutline} />
+                      <IonLabel>
+                        {getDateTime(appointment.actualDateTime).split(" ")[0] +
+                          " " +
+                          getDateTime(appointment.actualDateTime).split(" ")[1]}
+                      </IonLabel>
+                    </IonItem>
+                    <IonItem>
+                      <IonIcon slot="start" />
+                      <IonLabel>
+                        {getDateTime(appointment.actualDateTime).split(" ")[2]}
+                      </IonLabel>
+                    </IonItem>
+                  </IonList>
+                </IonCardContent>
+              </IonCard>
+            ))}
           </>
         )}
       </IonContent>

@@ -28,6 +28,7 @@ import {
   IonThumbnail,
   IonAlert,
   IonToast,
+  IonAvatar,
 } from "@ionic/react";
 import {
   pencil,
@@ -44,7 +45,12 @@ import {
   useParams,
   useLocation,
 } from "react-router";
-import { appointmentApi, departmentApi } from "../../api/Api";
+import {
+  appointmentApi,
+  departmentApi,
+  imageServerApi,
+  staffApi,
+} from "../../api/Api";
 import dayjs from "dayjs";
 import heartLogo from "../../assets/heartLogo.png";
 import SelectDateTime from "./SelectDateTime";
@@ -61,6 +67,7 @@ interface Appointment {
   message: string;
   arrived: boolean;
   staffDetails: Staff;
+  swimlaneStatusEnum: string;
 }
 
 interface Staff {
@@ -70,6 +77,9 @@ interface Staff {
     unitId: number;
     name: string;
   };
+  profilePicture: FormData;
+  image: any;
+  staffRoleEnum: string;
 }
 
 const ViewAppointment = () => {
@@ -80,9 +90,11 @@ const ViewAppointment = () => {
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [appointmentDTO, setAppointmentDTO] = useState(null);
+  const [attendedStaff, setAttendedStaff] = useState<Staff[]>([]);
 
   const handleEdit = () => {
-    history.push(`/tabs/appointments/edit/${id}`, {
+    history.push(`/tabs/services/appointments/edit/${id}`, {
       department: state?.department,
       bookedDateTime: state?.bookedDateTime,
       appointmentId: id,
@@ -110,7 +122,22 @@ const ViewAppointment = () => {
     }
   };
 
-  const isAppointmentPast = (dt: string[]) => {
+  const handleGetProfileImage = async (profilePicture: any) => {
+    if (profilePicture) {
+      const response = await imageServerApi.getImageFromImageServer(
+        "id",
+        profilePicture
+      );
+      const imageURL = URL.createObjectURL(response.data);
+      // setProfileImage(imageURL);
+    }
+  };
+
+  const isAppointmentPast = (dt: string[], swimlaneStatusEnum: string) => {
+    if (swimlaneStatusEnum == "DONE") {
+      return true;
+    }
+
     if (!dt) return false;
     const [year, month, day, hour, minute] = dt.map(Number);
 
@@ -127,12 +154,58 @@ const ViewAppointment = () => {
     return false;
   };
 
+  function createBlobUrl(blob: Blob) {
+    return URL.createObjectURL(blob);
+  }
+
+  const fetchPastData = async (appointmentId: number) => {
+    try {
+      const response = await appointmentApi.getAppointmentDTOById(
+        appointmentId
+      );
+      setAppointmentDTO(response.data);
+
+      let list = [];
+      const attendingStaffList = response.data.listOfStaffsId;
+
+      for (let i = 0; i < attendingStaffList.length; i++) {
+        const staffResponse = await staffApi.getStaffById(
+          attendingStaffList[i]
+        );
+        list.push(staffResponse.data);
+
+        const imageResponse = await imageServerApi.getImageFromImageServer(
+          "id",
+          staffResponse.data.profilePicture.imageLink
+        );
+        // Ensure the image data is treated as Blob
+        const imageBlob = new Blob([imageResponse.data], {
+          type: imageResponse.headers["content-type"],
+        });
+        list[i].image = imageBlob;
+      }
+      console.log(list);
+      setAttendedStaff(list);
+
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log(state);
+    if (state) {
+      fetchPastData(state.appointmentId);
+    }
+  }, []);
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton></IonBackButton>
+          <IonBackButton defaultHref="/tabs/services/appointments"></IonBackButton>
           </IonButtons>
           <IonTitle>View Appointment</IonTitle>
         </IonToolbar>
@@ -143,7 +216,10 @@ const ViewAppointment = () => {
             <b>Appointment</b>
           </IonText>
           <IonText>
-            {!isAppointmentPast(state?.bookedDateTime) ? (
+            {!isAppointmentPast(
+              state?.bookedDateTime,
+              state?.swimlaneStatusEnum
+            ) ? (
               <>
                 <IonText
                   style={{ fontSize: "15px", color: "blue" }}
@@ -198,49 +274,92 @@ const ViewAppointment = () => {
         )}
         <br />
         <br />
-        <IonText style={{ fontSize: "16px" }}>
-          <b>Arrived: </b>
-          {state?.arrived ? "Yes" : "No"}
-        </IonText>
-        <br />
-        <br />
+        {!isAppointmentPast(
+          state?.bookedDateTime,
+          state?.swimlaneStatusEnum
+        ) && (
+          <>
+            <IonText style={{ fontSize: "16px" }}>
+              <b>Arrived: </b>
+              {state?.arrived ? "Yes" : "No"}
+            </IonText>
+            <br />
+            <br />
+          </>
+        )}
+
         <IonText style={{ fontSize: "16px" }}>
           <b>Description:</b> {state?.description ? state?.description : "-"}
         </IonText>
         <br />
         <br />
-        <IonCard>
-          <IonCardHeader>
-            <IonCardSubtitle>Pre-appointment instructions</IonCardSubtitle>
-          </IonCardHeader>
+        {!isAppointmentPast(
+          state?.bookedDateTime,
+          state?.swimlaneStatusEnum
+        ) ? (
+          <>
+            <IonCard>
+              <IonCardHeader>
+                <IonCardSubtitle>Pre-appointment instructions</IonCardSubtitle>
+              </IonCardHeader>
 
-          <IonCardContent style={{ fontSize: "14px" }}>
-            <li>
-              Ensure you bring along your insurance card, ID, referral, and any
-              other required documents ready for your appointment.
-            </li>
-            <li>
-              Ensure you have 7 hours of uninterrupted rest before your
-              appointment.
-            </li>
-            <li>
-              If this is your first visit, please bring along the items listed
-              above and:
-              <ul>
+              <IonCardContent style={{ fontSize: "14px" }}>
                 <li>
-                  Referral letter from your polyclinic / other healthcare
-                  institutions/ private doctor
+                  Ensure you bring along your insurance card, ID, referral, and
+                  any other required documents ready for your appointment.
                 </li>
-                <li>Medication, if any</li>
                 <li>
-                  X-ray and investigation records (within the last 6 months), if
-                  any
+                  Ensure you have 7 hours of uninterrupted rest before your
+                  appointment.
                 </li>
-              </ul>
-            </li>
-          </IonCardContent>
-        </IonCard>
-        <IonText style={{ fontSize: "16px" }}>
+                <li>
+                  If this is your first visit, please bring along the items
+                  listed above and:
+                  <ul>
+                    <li>
+                      Referral letter from your polyclinic / other healthcare
+                      institutions/ private doctor
+                    </li>
+                    <li>Medication, if any</li>
+                    <li>
+                      X-ray and investigation records (within the last 6
+                      months), if any
+                    </li>
+                  </ul>
+                </li>
+              </IonCardContent>
+            </IonCard>
+          </>
+        ) : (
+          <>
+            <IonCard>
+              <IonCardHeader>
+                <IonCardSubtitle>Attended Staff</IonCardSubtitle>
+              </IonCardHeader>
+
+              <IonCardContent style={{ fontSize: "14px" }}>
+                <IonList>
+                  {attendedStaff.map((staff, index) => (
+                    <IonItem key={index}>
+                      <IonAvatar slot="start">
+                        <img src={createBlobUrl(staff.image)} alt="Staff" />
+                      </IonAvatar>
+                      <IonLabel>
+                        <IonCardTitle style={{ fontSize: "14px"}}>
+                          {staff.firstname} {staff.lastname}
+                          {" (" + staff.staffRoleEnum + ")"}
+                        </IonCardTitle>
+                        <IonCardSubtitle style={{ fontSize: "13px"}} >{staff.unit.name}</IonCardSubtitle>
+                      </IonLabel>
+                    </IonItem>
+                  ))}
+                </IonList>
+              </IonCardContent>
+            </IonCard>
+          </>
+        )}
+
+        <IonText style={{ fontSize: "16px", marginTop: "10px" }}>
           <b>Address:</b> <br /> 21 Lower Kent Ridge Rd, Blk H2 #02-05,
           Singapore 119077
         </IonText>
